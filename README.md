@@ -8,7 +8,7 @@ Local-first production pipeline for TikTok and YouTube Shorts for **Yuzhen Chơi
 python3 -m pipeline run --game "Liên Quân Mobile" --mode ENTERTAINMENT
 ```
 
-The first run creates `outputs/lien-quan-mobile/` with three ideas, a 35–50 second script, timed storyboard, channel copy, and `checkpoint.json`. It attempts voice generation only if Piper and the Vietnamese model are installed. Rendering requires licensed gameplay at `assets/user/gameplay.mp4` and a validated narration WAV; absent inputs are listed in the checkpoint. It does not fabricate either.
+The first run creates `outputs/lien-quan-mobile/` with three ideas, a 35–50 second script, timed storyboard, channel copy, and `checkpoint.json`. New production voice uses the approved VieNeu-TTS Minh Quân preset, with Piper as fallback. Rendering requires rights-cleared gameplay at `assets/user/gameplay.mp4` and a validated narration WAV; absent inputs are listed in the checkpoint. It does not fabricate either.
 
 ## Offline Vietnamese voice
 
@@ -53,7 +53,7 @@ The adapter automatically discovers `.venv/bin/piper` and the default model in `
 
 ## Optional VieNeu gaming voice
 
-Piper remains the active fallback. VieNeu-TTS v3 Turbo is an independent, CPU/ONNX adapter; install the pinned SDK/model/codec with `bash scripts/setup_vieneu.sh`. It uses a separate `.vieneu-venv`, pinned upstream revisions, and Git-ignored model/cache directories under `assets/models/`. No CUDA GPU is required. The upstream model and codec publish Apache-2.0 terms; attribution is recorded in `THIRD_PARTY-NOTICES.md`.
+VieNeu-TTS v3 Turbo is the approved default for new productions, with Piper as an independent fallback. Install the pinned SDK/model/codec with `bash scripts/setup_vieneu.sh`. It uses a separate `.vieneu-venv`, pinned upstream revisions, and Git-ignored model/cache directories under `assets/models/`. No CUDA GPU is required. The upstream model and codec publish Apache-2.0 terms; attribution is recorded in `THIRD_PARTY-NOTICES.md`.
 
 The locked SDK is 3.7.1 because its actual `list_preset_voices()` roster includes the exact male preset IDs `Minh Quân` and `Anh Khôi`. SDK 3.8.3 renames these and only resolves the old names as aliases to different canonical labels, so this project does not use those aliases for the Minh Quân candidate.
 
@@ -68,23 +68,23 @@ Three WAVs are written to `outputs/voice-previews/minh-quan/` only when the inst
 
 The unapproved pronunciation dictionary is in `config/pronunciation/game-terms.json`. It makes no dialogue substitutions; terms can receive a spoken override only after a person confirms the intended pronunciation.
 
-The Cloud environment setup command for a fresh task is:
+For a fresh Codex Cloud environment, enter this command in the selected environment's **Setup script** field so both engines are installed again; local ignored models are not guaranteed to carry across tasks:
 
 ```sh
-cd /workspace/Yuzhen-AI-Studio && bash scripts/setup_vieneu.sh
+cd /workspace/Yuzhen-AI-Studio && bash scripts/setup_offline_voice.sh && bash scripts/setup_vieneu.sh
 ```
 
-The script reinstalls the pinned CPU dependencies and retrieves/checksums the exact model and codec revisions into ignored project paths. It requires access to PyPI and Hugging Face via the configured Cloud network policy. Preview outputs remain ignored local artifacts and are not committed.
+These scripts reinstall the pinned CPU dependencies and retrieve/checksum the exact VieNeu model and codec revisions into ignored project paths (plus Piper's Vietnamese voice for fallback). They require access to PyPI and Hugging Face via the configured Cloud network policy. Preview outputs remain ignored local artifacts and are not committed.
 
 ### Reuse in Codex Cloud
 
-For a fresh Cloud environment, add this one-line setup command in the selected environment's **Setup script** field after this repository branch is available there:
+For a fresh Cloud environment, add this setup command in the selected environment's **Setup script** field after this repository branch is available there:
 
 ```sh
-cd /workspace/Yuzhen-AI-Studio && bash scripts/setup_offline_voice.sh
+cd /workspace/Yuzhen-AI-Studio && bash scripts/setup_offline_voice.sh && bash scripts/setup_vieneu.sh
 ```
 
-The script is safe to rerun: it reuses an existing `.venv` and model after checksum verification, and repairs missing/corrupt files. Current Cloud configuration can be changed from the Codex Cloud Environments settings UI; this task cannot write that UI setting. The setup command needs outbound access to PyPI and Hugging Face through the configured proxy.
+The setup scripts are safe to rerun and verify pinned artifacts. Current Cloud configuration can be changed from the Codex Cloud Environments settings UI; this task cannot write that UI setting. The setup command needs outbound access to PyPI and Hugging Face through the configured proxy.
 
 ## Continue the first production
 
