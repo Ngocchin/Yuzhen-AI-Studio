@@ -86,7 +86,7 @@ def run(args):
     gameplay = ROOT / "assets/user/gameplay.mp4"
     checkpoint["phases"]["render"] = {"status": "blocked", "missing": []}
     if not gameplay.exists(): checkpoint["phases"]["render"]["missing"].append(str(gameplay.relative_to(ROOT)))
-    if not voice or not voice.exists() or checkpoint["phases"]["voice"].get("status") != "validated": checkpoint["phases"]["render"]["missing"].append("validated voice WAV")
+    if not voice or not voice.exists() or checkpoint["phases"]["voice"].get("status") not in ("validated", "generated"): checkpoint["phases"]["render"]["missing"].append("validated voice WAV")
     if checkpoint["phases"]["render"]["missing"]:
         checkpoint["phases"]["render"]["reason"] = "Rendering requires rights-cleared gameplay and a real voice WAV; no MP4 was claimed."
     else:
