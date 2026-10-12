@@ -1,6 +1,7 @@
 {
   "active_engine": "vieneu",
   "selected_vieneu_voice": "Minh Quân",
+  "allow_automatic_production_fallback": false,
   "production_modes": ["game-commentary", "storytelling", "comedy-meme"],
   "fallback_engine": "piper",
   "vieneu": {

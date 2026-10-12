@@ -9,6 +9,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from pipeline.voice_router import inspect as inspect_voice, synthesize
 from pipeline.voice import validate_wav
+from pipeline import story_strategy
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -30,6 +31,8 @@ def run(args):
     if checkpoint.get("mode") != args.mode:
         checkpoint["phases"] = {}
     checkpoint["mode"] = args.mode
+    policy = story_strategy.load_config()
+    checkpoint["content_strategy"] = {"config": "config/content-strategy.json", "story_first": policy["story_first"], "voice_engine": policy["voice"]["engine"], "voice_version": policy["voice"]["version"], "voice_preset": policy["voice"]["preset"]}
     if args.mode == "NEWS":
         checkpoint["status"] = "NETWORK_BLOCKED"
         checkpoint["phases"]["trend_hunter"] = {"status": "NETWORK_BLOCKED", "reason": "No verified source records or network research configured."}
@@ -39,10 +42,16 @@ def run(args):
         return 2
 
     ideas = [
-        {"title": "Đợi farm thêm một món thì combat nổ", "score": {"humor": 5, "clarity": 5, "feasibility": 5}, "premise": "Xạ thủ xin thêm đúng một đợt lính; cả đội mở combat ngay."},
-        {"title": "Ping rút lui nhưng chân tự lao vào", "score": {"humor": 4, "clarity": 5, "feasibility": 5}, "premise": "Miệng bảo rút, tay lại tốc biến theo đồng đội."},
-        {"title": "Đồng đội bảo giữ chiêu cuối", "score": {"humor": 4, "clarity": 4, "feasibility": 4}, "premise": "Giữ chiêu cuối đến hết trận rồi mới nhớ ra."}
+        {"title": "Đợi farm thêm một món thì combat nổ", "premise": "Một tình huống tổng hợp hư cấu: xạ thủ xin thêm một đợt lính; cả đội mở combat.", "category": "GAME", "claim_type": "FICTION", "storytelling_dimensions": {"story_appeal": 21, "conflict_mystery_climax": 16, "curiosity_hook": 19, "emotion_debate": 13, "gaming_community_fit": 9, "rights_cleared_media_feasibility": 9}, "viral_potential_score": 88},
+        {"title": "Ping rút lui nhưng chân tự lao vào", "premise": "Tình huống tổng hợp hư cấu: miệng bảo rút nhưng nhân vật lao theo đồng đội.", "category": "GAME", "claim_type": "FICTION", "storytelling_dimensions": {"story_appeal": 20, "conflict_mystery_climax": 17, "curiosity_hook": 18, "emotion_debate": 12, "gaming_community_fit": 9, "rights_cleared_media_feasibility": 9}, "viral_potential_score": 84},
+        {"title": "Đồng đội bảo giữ chiêu cuối", "premise": "Tình huống tổng hợp hư cấu: người chơi giữ chiêu cuối tới lúc trận đấu kết thúc.", "category": "GAME", "claim_type": "FICTION", "storytelling_dimensions": {"story_appeal": 19, "conflict_mystery_climax": 15, "curiosity_hook": 17, "emotion_debate": 12, "gaming_community_fit": 9, "rights_cleared_media_feasibility": 8}, "viral_potential_score": 80}
     ]
+    for idea in ideas:
+        decision = story_strategy.topic_decision({**idea, "story_angle": idea["premise"]})
+        idea["storytelling_score"] = story_strategy.storytelling_score(idea["storytelling_dimensions"])
+        idea["combined_priority_score"] = story_strategy.rank_score(idea["storytelling_score"], idea["viral_potential_score"])
+        idea["qualified_for_shortlist"] = decision["eligible"] and idea["storytelling_score"] >= policy["storytelling_score"]["minimum"]
+        idea["claim_note"] = "Composite fictional scenario; not a report of a real match."
     script = {
       "title": ideas[0]["title"], "duration_seconds": 42,
       "voiceover": [

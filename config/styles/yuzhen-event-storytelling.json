@@ -1,7 +1,7 @@
 {
   "id": "yuzhen-event-storytelling",
   "version": 1,
-  "canvas": {"width": 1080, "height": 1920, "fps": 30, "aspect_ratio": "9:16", "duration_min_seconds": 35, "duration_max_seconds": 50},
+  "canvas": {"width": 1080, "height": 1920, "fps": 30, "aspect_ratio": "9:16", "duration_min_seconds": 35, "duration_max_seconds": 60},
   "palette": {"background": "#071522", "surface": "#10283B", "blue": "#168FE8", "cyan": "#57D9FF", "white": "#F5FAFF", "muted": "#B6C8D8", "highlight": "#FFD66B"},
   "typography": {"font_regular": "/usr/share/fonts/truetype/noto/NotoSans-Regular.ttf", "font_bold": "/usr/share/fonts/truetype/noto/NotoSans-Bold.ttf", "caption_color": "#FFFFFF", "caption_outline": "#071522", "caption_outline_width": 4, "caption_font_size": 40},
   "safe_area": {"left": 88, "right": 88, "top": 170, "bottom": 250},

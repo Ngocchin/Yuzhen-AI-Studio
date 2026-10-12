@@ -16,7 +16,7 @@ class EventStorytellingStyleTests(unittest.TestCase):
             "fps": 30,
             "aspect_ratio": "9:16",
             "duration_min_seconds": 35,
-            "duration_max_seconds": 50,
+            "duration_max_seconds": 60,
         })
         self.assertEqual(style["audio"]["voice_profile"], "Minh Quân")
         self.assertFalse(style["branding"]["creator_reference_logo_allowed"])

@@ -8,7 +8,13 @@ Local-first production pipeline for TikTok and YouTube Shorts for **Yuzhen Chơi
 python3 -m pipeline run --game "Liên Quân Mobile" --mode ENTERTAINMENT
 ```
 
-The first run creates `outputs/lien-quan-mobile/` with three ideas, a 35–50 second script, timed storyboard, channel copy, and `checkpoint.json`. New production voice uses the approved VieNeu-TTS Minh Quân preset, with Piper as fallback. Rendering requires rights-cleared gameplay at `assets/user/gameplay.mp4` and a validated narration WAV; absent inputs are listed in the checkpoint. It does not fabricate either.
+The first run creates `outputs/lien-quan-mobile/` with three ideas, a 35–60 second story script, timed storyboard, channel copy, and `checkpoint.json`. Every new production requires the approved VieNeu-TTS 3.7.1 Minh Quân voice; if unavailable, voice generation is blocked. Piper remains a separately configured fallback adapter and must not silently replace Minh Quân in a production. Rendering requires rights-cleared media and validated narration; absent inputs are listed in the checkpoint. It does not fabricate either.
+
+## Permanent gaming storytelling strategy
+
+`config/content-strategy.json` is the channel's persistent editorial policy. Yuzhen Chơi Gì prioritizes character lore, memorable in-game stories, esports history, and mysteries. Apply the admin-only hard filter before scoring; standalone event schedules, ticket/registration guides, buses, routine rewards, maintenance, promotions, and code guides are off-brand. Events are eligible only with a meaningful story angle. Source factual/canon claims; label CANON, REAL_EVENT, REAL_MATCH, FAN_THEORY, or FICTION. Score story appeal (25), conflict/mystery/climax (20), curiosity hook (20), emotion/debate (15), community fit (10), and rights-cleared media feasibility (10). Only stories scoring at least 75 proceed. Rank using 70% Storytelling Score and 30% Viral Potential; verified Hot Score is a tie-breaker only. These are editorial heuristics, not predictions of views.
+
+Use the reusable policy functions in `pipeline/story_strategy.py` when filtering and scoring researched topics. Ten ideas should be researched when sufficient evidence exists; report the best five and select from those. Follow HOOK → SETUP → CONFLICT → CLIMAX → PAYOFF → ENDING. The approved VieNeu-TTS 3.7.1 Minh Quân preset is required; fail closed if unavailable. Never present original motion graphics as gameplay or infer media rights from public availability.
 
 ## Offline Vietnamese voice
 
@@ -69,7 +75,7 @@ The adapter automatically discovers `.venv/bin/piper` and the default model in `
 
 ## Optional VieNeu gaming voice
 
-VieNeu-TTS v3 Turbo is the approved default for new productions, with Piper as an independent fallback. Install the pinned SDK/model/codec with `bash scripts/setup_vieneu.sh`. It uses a separate `.vieneu-venv`, pinned upstream revisions, and Git-ignored model/cache directories under `assets/models/`. No CUDA GPU is required. The upstream model and codec publish Apache-2.0 terms; attribution is recorded in `THIRD_PARTY-NOTICES.md`.
+VieNeu-TTS v3 Turbo, SDK 3.7.1, with the approved Minh Quân preset is mandatory for new productions. If unavailable, mark voice production BLOCKED; do not silently use another voice. Piper remains a separately available fallback adapter for explicitly authorized non-production use. Install the pinned SDK/model/codec with `bash scripts/setup_vieneu.sh`. It uses a separate `.vieneu-venv`, pinned upstream revisions, and Git-ignored model/cache directories under `assets/models/`. No CUDA GPU is required. The upstream model and codec publish Apache-2.0 terms; attribution is recorded in `THIRD_PARTY-NOTICES.md`.
 
 The locked SDK is 3.7.1 because its actual `list_preset_voices()` roster includes the exact male preset IDs `Minh Quân` and `Anh Khôi`. SDK 3.8.3 renames these and only resolves the old names as aliases to different canonical labels, so this project does not use those aliases for the Minh Quân candidate.
 
@@ -80,7 +86,7 @@ Check the exact preset roster and generate the three Minh Quân delivery preview
 .vieneu-venv/bin/python -m pipeline.vieneu_voice previews
 ```
 
-Three WAVs are written to `outputs/voice-previews/minh-quan/` only when the installed roster contains that exact preset and identifies it as male. Existing files are never overwritten. Preview delivery modes use the same speaker; SDK 3.7.1 ignores its style parameter, so contrast comes only from punctuation, sentence boundaries, and pauses. There is no speed override, pitch shifting, or SFX in the source WAVs. The user has approved Minh Quân as the default for new game commentary, storytelling, and comedy-meme productions. `config/voice.json` selects VieNeu preset `Minh Quân`; Piper remains the fallback. This applies only to new productions and does not modify existing videos or checkpoints. The voice engine must be available in the runtime before synthesis; tests can use the mock voice backend.
+Three WAVs are written to `outputs/voice-previews/minh-quan/` only when the installed roster contains that exact preset and identifies it as male. Existing files are never overwritten. Preview delivery modes use the same speaker; SDK 3.7.1 ignores its style parameter, so contrast comes only from punctuation, sentence boundaries, and pauses. There is no speed override, pitch shifting, or SFX in the source WAVs. The user approved Minh Quân as the default for new game commentary, storytelling, and comedy-meme productions. `config/voice.json` selects VieNeu preset `Minh Quân` and disables automatic production fallback. Existing videos are not modified. The voice engine must be available in the runtime before synthesis; tests can use the mock voice backend.
 
 The unapproved pronunciation dictionary is in `config/pronunciation/game-terms.json`. It makes no dialogue substitutions; terms can receive a spoken override only after a person confirms the intended pronunciation.
 

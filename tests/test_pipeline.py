@@ -16,12 +16,13 @@ from pipeline import voice_router
 
 
 class StudioPipelineTests(unittest.TestCase):
-    def test_approved_min_quan_is_default_with_piper_fallback(self):
+    def test_approved_min_quan_is_mandatory_and_piper_cannot_fallback_automatically(self):
         config = json.loads((studio.ROOT / "config/voice.json").read_text())
         profile = json.loads((studio.ROOT / "config/voice_profiles/minh-quan.json").read_text())
         self.assertEqual(config["active_engine"], "vieneu")
         self.assertEqual(config["selected_vieneu_voice"], "Minh Quân")
         self.assertEqual(config["fallback_engine"], "piper")
+        self.assertFalse(config["allow_automatic_production_fallback"])
         self.assertTrue(profile["enabled_as_default"])
         self.assertEqual(profile["approval_status"], "APPROVED_BY_USER")
         self.assertEqual(config["production_modes"], ["game-commentary", "storytelling", "comedy-meme"])
@@ -56,11 +57,16 @@ class StudioPipelineTests(unittest.TestCase):
         self.assertEqual(config["active_engine"], "vieneu")
         self.assertEqual(config["selected_vieneu_voice"], "Minh Quân")
 
-    def test_voice_router_uses_piper_when_vieneu_sdk_is_missing(self):
+    def test_production_voice_router_blocks_instead_of_substituting_min_quan(self):
         with patch.object(voice_router.vieneu_voice, "VENV_PYTHON", Path("/definitely/missing/vieneu-python")), patch.object(voice_router, "synthesize_piper", return_value={"status": "generated"}) as fallback:
             result = voice_router.synthesize("test", "voice.wav")
+        self.assertEqual(result["status"], "blocked")
+        fallback.assert_not_called()
+
+    def test_piper_fallback_requires_explicit_opt_in(self):
+        with patch.object(voice_router.vieneu_voice, "VENV_PYTHON", Path("/definitely/missing/vieneu-python")), patch.object(voice_router, "synthesize_piper", return_value={"status": "generated"}) as fallback:
+            result = voice_router.synthesize("test", "voice.wav", allow_fallback=True)
         self.assertEqual(result["fallback_from"], "vieneu")
-        self.assertEqual(result["status"], "generated")
         fallback.assert_called_once_with("test", "voice.wav")
 
     def test_vietnamese_game_slug(self):
