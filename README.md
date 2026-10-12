@@ -24,6 +24,22 @@ Automated QC checks file metadata and audio/video stream presence; human listeni
 
 Agent 00 coordinates agents 01–07 through checkpointed phases. Entertainment mode runs idea selection, script/storyboard, voice, rendering, QC, and channel copy in order. NEWS mode intentionally stops at the Trend Hunter evidence gate with `NETWORK_BLOCKED` when research sources cannot be independently verified. The files in `agents/` contain each role's operating rules; `config/agents.json` is the machine-readable registry. Channel copy generation never publishes.
 
+## Event storytelling style
+
+The reusable `yuzhen-event-storytelling` profile is in `config/styles/`. It defines a blue 1080x1920, 30 FPS design, safe areas, Vietnamese subtitle styling, restrained zoom/pan and transition settings, and the approved Minh Quân voice. `pipeline/event_storytelling.py` renders original information cards with FFmpeg motion and crossfades. Source images can be used only after the Media Hunter records their rights in `reports/media-sources.md`; no gameplay or other creator's branding is generated as a substitute.
+
+Render a timed storyboard with the style profile using:
+
+```sh
+.vieneu-venv/bin/python -m pipeline.event_storytelling \
+  --storyboard outputs/<production>/storyboard.json \
+  --audio outputs/<production>/voice-minh-quan.wav \
+  --subtitles outputs/<production>/subtitles.srt \
+  --output outputs/<production>/final.mp4
+```
+
+The renderer uses the optional Pillow dependency in `requirements-render.txt`. It refuses to overwrite an existing MP4 or scene-card directory.
+
 ## Piper voice setup
 
 The voice adapter is `pipeline/voice.py`. It supports runtime discovery, WAV validation, synthesis, and manual model import. Run `bash scripts/setup_offline_voice.sh` to install the pinned Linux/Python dependencies into the ignored project `.venv`, download the pinned Vietnamese model files, and verify their digests. Model weights, package caches, the virtual environment, license record, and generated WAVs remain outside Git.

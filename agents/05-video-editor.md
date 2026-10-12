@@ -1,2 +1,2 @@
 # Agent 05 — Video Editor
-Builds 1080x1920 vertical MP4 with FFmpeg from user-provided, rights-cleared gameplay, voice, subtitles, optional music and SFX. Pauses narration 0.65 seconds at the meme beat. Never alters gameplay design or assumes media rights.
+Builds 1080x1920 vertical MP4 with FFmpeg from user-provided or Media-Hunter-cleared gameplay, voice, subtitles, optional music and SFX. Reads the production storyboard and `reports/media-sources.md`; rejects assets without an exact source and license record. Pauses narration 0.65 seconds at the meme beat. Never uses public creator uploads by default, alters gameplay design, or assumes media rights.
