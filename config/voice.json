@@ -1,6 +1,8 @@
 {
-  "active_engine": "piper",
-  "selected_vieneu_voice": null,
+  "active_engine": "vieneu",
+  "selected_vieneu_voice": "Minh Quân",
+  "production_modes": ["game-commentary", "storytelling", "comedy-meme"],
+  "fallback_engine": "piper",
   "vieneu": {
     "precision": "fp32",
     "cpu_threads": 2,

@@ -1,4 +1,4 @@
-"""Select the configured speech engine while preserving Piper as the default."""
+"""Select the configured speech engine; Piper remains available as fallback."""
 import json
 import os
 import subprocess
@@ -46,7 +46,7 @@ def synthesize(text: str, output: str | Path) -> dict:
     if not voice_name:
         return {"status": "blocked", "reason": "No VieNeu preset selected; listen to the comparison samples and set selected_vieneu_voice in config/voice.json."}
     if not vieneu_voice.VENV_PYTHON.is_file():
-        return {"status": "blocked", "reason": "VieNeu SDK is not installed. Run bash scripts/setup_vieneu.sh."}
+        return _fallback_to_piper(text, output, "VieNeu SDK is not installed. Run bash scripts/setup_vieneu.sh.", config)
     target = Path(output).expanduser()
     if not target.is_absolute():
         target = ROOT / target
@@ -59,7 +59,17 @@ def synthesize(text: str, output: str | Path) -> dict:
         result = subprocess.run(command, cwd=ROOT, env=env, capture_output=True, text=True, timeout=600)
         data = json.loads(result.stdout)
     except (OSError, subprocess.TimeoutExpired, json.JSONDecodeError) as error:
-        return {"status": "failed", "reason": str(error)}
+        return _fallback_to_piper(text, output, str(error), config)
     if result.returncode and data.get("status") not in ("generated",):
         data.setdefault("stderr", result.stderr[-1500:])
+        return _fallback_to_piper(text, output, data.get("reason", data.get("stderr", "VieNeu synthesis failed")), config)
     return data
+
+
+def _fallback_to_piper(text: str, output: str | Path, cause: str, config: dict) -> dict:
+    if config.get("fallback_engine") != "piper":
+        return {"status": "failed", "reason": cause}
+    result = synthesize_piper(text, output)
+    result["fallback_from"] = "vieneu"
+    result["fallback_reason"] = cause
+    return result

@@ -16,10 +16,15 @@ from pipeline import voice_router
 
 
 class StudioPipelineTests(unittest.TestCase):
-    def test_vieneu_is_opt_in_and_no_preset_is_preselected(self):
+    def test_approved_min_quan_is_default_with_piper_fallback(self):
         config = json.loads((studio.ROOT / "config/voice.json").read_text())
-        self.assertEqual(config["active_engine"], "piper")
-        self.assertIsNone(config["selected_vieneu_voice"])
+        profile = json.loads((studio.ROOT / "config/voice_profiles/minh-quan.json").read_text())
+        self.assertEqual(config["active_engine"], "vieneu")
+        self.assertEqual(config["selected_vieneu_voice"], "Minh Quân")
+        self.assertEqual(config["fallback_engine"], "piper")
+        self.assertTrue(profile["enabled_as_default"])
+        self.assertEqual(profile["approval_status"], "APPROVED_BY_USER")
+        self.assertEqual(config["production_modes"], ["game-commentary", "storytelling", "comedy-meme"])
         self.assertEqual([item["requested_name"] for item in config["vieneu"]["presets_to_compare"]], ["Minh Quân", "Anh Khôi", "Đức Trí"])
 
     def test_vieneu_alias_resolution_requires_an_installed_voice_and_excludes_adam(self):
@@ -46,10 +51,17 @@ class StudioPipelineTests(unittest.TestCase):
             self.assertEqual(result["status"], "refused")
             self.assertEqual(path.read_bytes(), b"existing approval")
 
-    def test_voice_router_keeps_piper_as_active_engine(self):
+    def test_voice_router_selects_approved_min_quan(self):
         config = voice_router.load_config()
-        self.assertEqual(config["active_engine"], "piper")
-        self.assertIsNone(config["selected_vieneu_voice"])
+        self.assertEqual(config["active_engine"], "vieneu")
+        self.assertEqual(config["selected_vieneu_voice"], "Minh Quân")
+
+    def test_voice_router_uses_piper_when_vieneu_sdk_is_missing(self):
+        with patch.object(voice_router.vieneu_voice, "VENV_PYTHON", Path("/definitely/missing/vieneu-python")), patch.object(voice_router, "synthesize_piper", return_value={"status": "generated"}) as fallback:
+            result = voice_router.synthesize("test", "voice.wav")
+        self.assertEqual(result["fallback_from"], "vieneu")
+        self.assertEqual(result["status"], "generated")
+        fallback.assert_called_once_with("test", "voice.wav")
 
     def test_vietnamese_game_slug(self):
         self.assertEqual(studio.slugify("Liên Quân Mobile"), "lien-quan-mobile")
