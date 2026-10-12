@@ -1,7 +1,8 @@
 {
   "channel_positioning": "Gaming storytelling: characters, in-game stories, history, rivalries, mysteries and clearly labeled fiction.",
   "story_first": true,
-  "categories": ["CHARACTER", "GAME", "EVENT_HISTORY", "MYSTERY"],
+  "categories": ["CHARACTER", "GAME", "LORE", "MYSTERY", "ESPORTS", "EVENT_HISTORY"],
+  "category_preference_order": ["CHARACTER", "GAME", "LORE", "MYSTERY", "ESPORTS", "EVENT_HISTORY"],
   "hard_filter": {
     "reject_admin_only": true,
     "reject_terms": ["xe bus", "xe đưa đón", "đăng ký nhận vé", "lịch nhận vé", "hướng dẫn nhận quà", "bảo trì", "khuyến mãi", "nhập code", "lịch sự kiện"],

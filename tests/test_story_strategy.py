@@ -55,6 +55,11 @@ class StoryStrategyTests(unittest.TestCase):
         self.assertTrue(result["production_blocked"])
         self.assertIsNone(result["selected"])
 
+    def test_category_preferences_break_ties_after_feasibility_priority(self):
+        common = {"qualified_for_shortlist": True, "storytelling_score": 80, "viral_potential_score": 80, "media_feasibility_score": 85, "production_priority_score": 81.5, "media_feasibility": {"production_ready_estimate": True}}
+        result = choose_production_topic([{**common, "title": "Esports", "category": "ESPORTS"}, {**common, "title": "Character", "category": "CHARACTER"}])
+        self.assertEqual(result["selected"]["title"], "Character")
+
     def test_min_quan_is_required_voice(self):
         config = load_config()["voice"]
         self.assertEqual(config["engine"], "VieNeu-TTS")

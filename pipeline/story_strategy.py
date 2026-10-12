@@ -104,9 +104,12 @@ def choose_production_topic(candidates: list[dict[str, Any]]) -> dict[str, Any]:
     qualified = [item for item in candidates if item.get("qualified_for_shortlist") and item.get("storytelling_score", -1) >= story_floor]
     ready = [item for item in qualified if item.get("media_feasibility_score", 0) >= media_floor and item.get("media_feasibility", {}).get("production_ready_estimate", False)]
     waiting = [item for item in qualified if item not in ready]
-    order = lambda item: (item.get("production_priority_score", 0), item.get("storytelling_score", 0), item.get("media_feasibility_score", 0))
-    ready.sort(key=order, reverse=True)
-    waiting.sort(key=order, reverse=True)
+    category_order = {name: index for index, name in enumerate(policy.get("category_preference_order", []))}
+    def order(item: dict[str, Any]) -> tuple[float, int, int, int]:
+        category = str(item.get("category", "")).upper()
+        return (-item.get("production_priority_score", 0), category_order.get(category, len(category_order)), -item.get("storytelling_score", 0), -item.get("media_feasibility_score", 0))
+    ready.sort(key=order)
+    waiting.sort(key=order)
     return {"selected": ready[0] if ready else None, "ready": ready, "waiting": waiting, "ranked": ready + waiting, "production_blocked": not bool(ready)}
 
 
