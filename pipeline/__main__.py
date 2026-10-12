@@ -7,7 +7,8 @@ import subprocess
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
-from pipeline.voice import inspect as inspect_voice, synthesize, validate_wav
+from pipeline.voice_router import inspect as inspect_voice, synthesize
+from pipeline.voice import validate_wav
 
 ROOT = Path(__file__).resolve().parents[1]
 

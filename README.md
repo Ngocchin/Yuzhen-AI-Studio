@@ -51,6 +51,27 @@ The voice adapter is `pipeline/voice.py`. It supports runtime discovery, WAV val
 
 The adapter automatically discovers `.venv/bin/piper` and the default model in `assets/models/`. Set `PIPER_BIN` and `PIPER_MODEL` in the untracked local `.env` file only if your installation uses other paths; `.env.example` shows the keys. Synthesis is successful only when Piper exits successfully and ffprobe confirms a non-empty WAV audio stream.
 
+## Optional VieNeu gaming voice
+
+Piper remains the active fallback. VieNeu-TTS v3 Turbo is an independent, CPU/ONNX adapter; install the pinned SDK/model/codec with `bash scripts/setup_vieneu.sh`. It uses a separate `.vieneu-venv`, pinned upstream revisions, and Git-ignored model/cache directories under `assets/models/`. No CUDA GPU is required. The upstream model and codec publish Apache-2.0 terms; attribution is recorded in `THIRD_PARTY-NOTICES.md`.
+
+Check the exact preset roster provided by the installed SDK and generate a three-voice comparison:
+
+```sh
+.vieneu-venv/bin/python -m pipeline.vieneu_voice voices
+.vieneu-venv/bin/python -m pipeline.vieneu_voice compare
+```
+
+Samples are written to a new timestamped folder in `outputs/voice-comparisons/`; existing files are never overwritten. Current SDK 3.8.3 aliases the requested “Minh Quân” to “Hải Đăng” and “Anh Khôi” to “Thiện Minh”; “Đức Trí” is still listed under that name. The adapter resolves aliases only after checking `list_preset_voices()`, records the canonical name in `comparison.json`, and does not use Adam. Listen to the WAVs before changing defaults. To opt in afterward, edit only `config/voice.json`: set `active_engine` to `vieneu` and `selected_vieneu_voice` to the canonical preset you approved. Until then the active engine stays `piper` and no VieNeu preset is selected. No pitch shifting is used.
+
+The Cloud environment setup command for a fresh task is:
+
+```sh
+cd /workspace/Yuzhen-AI-Studio && bash scripts/setup_vieneu.sh
+```
+
+The script reinstalls pinned Python dependencies and retrieves the exact model and codec revisions into ignored project paths. It requires access to PyPI and Hugging Face via the configured Cloud network policy. The comparison outputs remain ignored local artifacts and are not committed.
+
 ### Reuse in Codex Cloud
 
 For a fresh Cloud environment, add this one-line setup command in the selected environment's **Setup script** field after this repository branch is available there:

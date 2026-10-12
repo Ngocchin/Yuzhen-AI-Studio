@@ -11,9 +11,46 @@ from unittest.mock import patch
 from pipeline import __main__ as studio
 from pipeline.voice import inspect as inspect_voice, validate_wav
 from pipeline import voice
+from pipeline import vieneu_voice
+from pipeline import voice_router
 
 
 class StudioPipelineTests(unittest.TestCase):
+    def test_vieneu_is_opt_in_and_no_preset_is_preselected(self):
+        config = json.loads((studio.ROOT / "config/voice.json").read_text())
+        self.assertEqual(config["active_engine"], "piper")
+        self.assertIsNone(config["selected_vieneu_voice"])
+        self.assertEqual([item["requested_name"] for item in config["vieneu"]["presets_to_compare"]], ["Minh Quân", "Anh Khôi", "Đức Trí"])
+
+    def test_vieneu_alias_resolution_requires_an_installed_voice_and_excludes_adam(self):
+        class FakeTTS:
+            def list_preset_voices(self):
+                return [("Hải Đăng — Nam", "Hải Đăng"), ("Thiện Minh — Nam", "Thiện Minh"), ("Đức Trí — Nam", "Đức Trí")]
+            def resolve_voice_name(self, name):
+                return {"Minh Quân": "Hải Đăng", "Anh Khôi": "Thiện Minh", "Đức Trí": "Đức Trí"}.get(name)
+
+        tts = FakeTTS()
+        self.assertEqual(vieneu_voice._canonical_voice(tts, "Minh Quân"), "Hải Đăng")
+        self.assertEqual(vieneu_voice._canonical_voice(tts, "Anh Khôi"), "Thiện Minh")
+        self.assertEqual(vieneu_voice._canonical_voice(tts, "Đức Trí"), "Đức Trí")
+        with self.assertRaises(ValueError):
+            vieneu_voice._canonical_voice(tts, "Adam")
+
+    def test_vieneu_wav_synthesis_refuses_to_overwrite(self):
+        class UnusedTTS:
+            pass
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "sample.wav"
+            path.write_bytes(b"existing approval")
+            result = vieneu_voice._synthesize(UnusedTTS(), "Minh Quân", path)
+            self.assertEqual(result["status"], "refused")
+            self.assertEqual(path.read_bytes(), b"existing approval")
+
+    def test_voice_router_keeps_piper_as_active_engine(self):
+        config = voice_router.load_config()
+        self.assertEqual(config["active_engine"], "piper")
+        self.assertIsNone(config["selected_vieneu_voice"])
+
     def test_vietnamese_game_slug(self):
         self.assertEqual(studio.slugify("Liên Quân Mobile"), "lien-quan-mobile")
 
