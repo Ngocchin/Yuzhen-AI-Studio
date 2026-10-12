@@ -35,7 +35,13 @@ def resolve_model(value=None):
 def inspect(model=None, executable=None):
     model_path = resolve_model(model)
     config_path = Path(str(model_path) + ".json")
-    piper = shutil.which(executable or os.environ.get("PIPER_BIN", "piper"))
+    configured_executable = executable or os.environ.get("PIPER_BIN")
+    project_venv_executable = ROOT / ".venv/bin/piper"
+    piper = shutil.which(configured_executable) if configured_executable else None
+    if not piper and project_venv_executable.is_file():
+        piper = str(project_venv_executable)
+    if not piper:
+        piper = shutil.which("piper")
     return {
         "engine": {"available": bool(piper), "path": piper},
         "model": {"path": str(model_path), "available": model_path.is_file(), "config_path": str(config_path), "config_available": config_path.is_file()},
@@ -74,7 +80,7 @@ def synthesize(text, output, model=None, executable=None):
     if not target.is_absolute():
         target = ROOT / target
     target.parent.mkdir(parents=True, exist_ok=True)
-    result = subprocess.run([piper, "--model", readiness["model"]["path"], "--output_file", str(target)], input=text.encode("utf-8"), capture_output=True)
+    result = subprocess.run([piper, "--model", readiness["model"]["path"], "--config", readiness["model"]["config_path"], "--output_file", str(target)], input=text.encode("utf-8"), capture_output=True)
     if result.returncode:
         return {"status": "failed", "reason": result.stderr.decode(errors="replace")[-1500:]}
     validation = validate_wav(target)
