@@ -1,0 +1,14 @@
+{
+  "director": "00",
+  "execution": "sequential_checkpointed",
+  "agents": [
+    {"id":"00","name":"DIRECTOR","phase":"orchestration","implementation":"pipeline/__main__.py","coordinates":["01","02","03","04","05","06","07"]},
+    {"id":"01","name":"TREND HUNTER","phase":"trend_hunter","implementation":"news evidence gate","modes":["NEWS"]},
+    {"id":"02","name":"CONTENT STRATEGIST","phase":"ideas","implementation":"Entertainment idea selection"},
+    {"id":"03","name":"SCRIPT WRITER","phase":"script_storyboard","implementation":"timed Vietnamese script and scenes"},
+    {"id":"04","name":"VOICE PRODUCER","phase":"voice","implementation":"pipeline/voice.py"},
+    {"id":"05","name":"VIDEO EDITOR","phase":"render","implementation":"FFmpeg renderer"},
+    {"id":"06","name":"QUALITY CONTROL","phase":"quality_control","implementation":"ffprobe media checks plus human review flags"},
+    {"id":"07","name":"CHANNEL MANAGER","phase":"channel_manager","implementation":"platform copy generation"}
+  ]
+}

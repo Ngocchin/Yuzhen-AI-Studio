@@ -1,0 +1,11 @@
+{
+  "channel": "Yuzhen Chơi Gì",
+  "target_width": 1080,
+  "target_height": 1920,
+  "fps": 30,
+  "meme_pause_seconds": 0.65,
+  "voice_model": "vi_VN-vais1000-medium",
+  "gameplay_path": "assets/user/gameplay.mp4",
+  "sfx_path": "assets/user/meme-sfx.wav",
+  "music_path": "assets/user/music.wav"
+}

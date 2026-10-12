@@ -1,0 +1,17 @@
+.env
+.venv/
+__pycache__/
+*.py[cod]
+*.onnx
+*.onnx.json
+*.wav
+*.mp3
+*.mp4
+assets/models/**
+!assets/models/.gitkeep
+assets/user/**
+!assets/user/.gitkeep
+outputs/*
+!outputs/.gitkeep
+reports/*
+!reports/.gitkeep
