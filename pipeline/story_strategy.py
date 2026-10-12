@@ -14,7 +14,7 @@ SCORE_FIELDS = (
     "curiosity_hook",
     "emotion_debate",
     "gaming_community_fit",
-    "rights_cleared_media_feasibility",
+    "narrative_originality_and_clarity",
 )
 ADMIN_TERMS = (
     "xe bus", "xe đưa đón", "đăng ký nhận vé", "lịch nhận vé", "nhận vé",
@@ -71,11 +71,43 @@ def storytelling_score(scores: dict[str, int]) -> int:
     return total
 
 
-def rank_score(story_score: int, viral_potential_score: int) -> float:
-    if not 0 <= story_score <= 100 or not 0 <= viral_potential_score <= 100:
-        raise ValueError("scores must be in [0, 100]")
-    ranking = load_config()["ranking"]
-    return round(story_score * ranking["storytelling_score_weight"] + viral_potential_score * ranking["viral_potential_score_weight"], 2)
+def rank_score(story_score: int, viral_potential_score: int, media_feasibility_score: int) -> float:
+    """Production priority; Hot/Viral Potential remains a separate input."""
+    return production_priority_score(story_score, viral_potential_score, media_feasibility_score)
+
+
+def production_priority_score(story_score: int, viral_potential_score: int, media_feasibility_score: int) -> float:
+    """Rank production readiness separately; this score is not a popularity signal."""
+    values = (story_score, viral_potential_score, media_feasibility_score)
+    if any(isinstance(v, bool) or not isinstance(v, int) or not 0 <= v <= 100 for v in values):
+        raise ValueError("story, viral, and media feasibility scores must be integers in [0, 100]")
+    weights = load_config()["ranking"]
+    total = sum((
+        weights["storytelling_score_weight"],
+        weights["viral_potential_score_weight"],
+        weights["media_feasibility_score_weight"],
+    ))
+    if abs(total - 1.0) > 1e-9:
+        raise ValueError("production priority weights must sum to 1")
+    return round(
+        story_score * weights["storytelling_score_weight"]
+        + viral_potential_score * weights["viral_potential_score_weight"]
+        + media_feasibility_score * weights["media_feasibility_score_weight"], 2
+    )
+
+
+def choose_production_topic(candidates: list[dict[str, Any]]) -> dict[str, Any]:
+    """Prefer Story-qualified candidates whose visual plan clears the readiness threshold."""
+    policy = load_config()
+    story_floor = policy["storytelling_score"]["minimum"]
+    media_floor = policy["media_feasibility"]["production_minimum"]
+    qualified = [item for item in candidates if item.get("qualified_for_shortlist") and item.get("storytelling_score", -1) >= story_floor]
+    ready = [item for item in qualified if item.get("media_feasibility_score", 0) >= media_floor and item.get("media_feasibility", {}).get("production_ready_estimate", False)]
+    waiting = [item for item in qualified if item not in ready]
+    order = lambda item: (item.get("production_priority_score", 0), item.get("storytelling_score", 0), item.get("media_feasibility_score", 0))
+    ready.sort(key=order, reverse=True)
+    waiting.sort(key=order, reverse=True)
+    return {"selected": ready[0] if ready else None, "ready": ready, "waiting": waiting, "ranked": ready + waiting, "production_blocked": not bool(ready)}
 
 
 def classify_claim(text: str, requested_type: str, has_sources: bool) -> str:

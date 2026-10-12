@@ -10,6 +10,10 @@ from pathlib import Path
 from pipeline.voice_router import inspect as inspect_voice, synthesize
 from pipeline.voice import validate_wav
 from pipeline import story_strategy
+from pipeline.media_feasibility import score_media_feasibility
+from pipeline.topic_queue import record_waiting_topic
+from pipeline.media_sources import classify_source
+from pipeline.event_storytelling import DEFAULT_STYLE, load_style, render_original_graphics
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -23,6 +27,12 @@ def slugify(value):
 def run(args):
     slug = slugify(args.game)
     out = ROOT / "outputs" / slug
+    if out.exists() and any(out.iterdir()):
+        base = out
+        counter = 2
+        while out.exists():
+            out = base.with_name(f"{base.name}-production-{counter:03d}")
+            counter += 1
     out.mkdir(parents=True, exist_ok=True)
     checkpoint_path = out / "checkpoint.json"
     checkpoint = json.loads(checkpoint_path.read_text()) if checkpoint_path.exists() else {
@@ -42,18 +52,36 @@ def run(args):
         return 2
 
     ideas = [
-        {"title": "Đợi farm thêm một món thì combat nổ", "premise": "Một tình huống tổng hợp hư cấu: xạ thủ xin thêm một đợt lính; cả đội mở combat.", "category": "GAME", "claim_type": "FICTION", "storytelling_dimensions": {"story_appeal": 21, "conflict_mystery_climax": 16, "curiosity_hook": 19, "emotion_debate": 13, "gaming_community_fit": 9, "rights_cleared_media_feasibility": 9}, "viral_potential_score": 88},
-        {"title": "Ping rút lui nhưng chân tự lao vào", "premise": "Tình huống tổng hợp hư cấu: miệng bảo rút nhưng nhân vật lao theo đồng đội.", "category": "GAME", "claim_type": "FICTION", "storytelling_dimensions": {"story_appeal": 20, "conflict_mystery_climax": 17, "curiosity_hook": 18, "emotion_debate": 12, "gaming_community_fit": 9, "rights_cleared_media_feasibility": 9}, "viral_potential_score": 84},
-        {"title": "Đồng đội bảo giữ chiêu cuối", "premise": "Tình huống tổng hợp hư cấu: người chơi giữ chiêu cuối tới lúc trận đấu kết thúc.", "category": "GAME", "claim_type": "FICTION", "storytelling_dimensions": {"story_appeal": 19, "conflict_mystery_climax": 15, "curiosity_hook": 17, "emotion_debate": 12, "gaming_community_fit": 9, "rights_cleared_media_feasibility": 8}, "viral_potential_score": 80}
+        {"title": "Đợi farm thêm một món thì combat nổ", "premise": "Một tình huống tổng hợp hư cấu: xạ thủ xin thêm một đợt lính; cả đội mở combat.", "category": "GAME", "claim_type": "FICTION", "storytelling_dimensions": {"story_appeal": 21, "conflict_mystery_climax": 16, "curiosity_hook": 19, "emotion_debate": 13, "gaming_community_fit": 9, "narrative_originality_and_clarity": 9}, "viral_potential_score": 88},
+        {"title": "Ping rút lui nhưng chân tự lao vào", "premise": "Một tình huống tổng hợp hư cấu: miệng bảo rút nhưng nhân vật lao theo đồng đội.", "category": "GAME", "claim_type": "FICTION", "storytelling_dimensions": {"story_appeal": 20, "conflict_mystery_climax": 17, "curiosity_hook": 18, "emotion_debate": 12, "gaming_community_fit": 9, "narrative_originality_and_clarity": 9}, "viral_potential_score": 84},
+        {"title": "Đồng đội bảo giữ chiêu cuối", "premise": "Một tình huống tổng hợp hư cấu: người chơi giữ chiêu cuối tới lúc trận đấu kết thúc.", "category": "GAME", "claim_type": "FICTION", "storytelling_dimensions": {"story_appeal": 19, "conflict_mystery_climax": 15, "curiosity_hook": 17, "emotion_debate": 12, "gaming_community_fit": 9, "narrative_originality_and_clarity": 8}, "viral_potential_score": 80}
     ]
     for idea in ideas:
         decision = story_strategy.topic_decision({**idea, "story_angle": idea["premise"]})
         idea["storytelling_score"] = story_strategy.storytelling_score(idea["storytelling_dimensions"])
-        idea["combined_priority_score"] = story_strategy.rank_score(idea["storytelling_score"], idea["viral_potential_score"])
+        scene_plan = [{"id": f"scene-{n}", "visual_plan": "clearly_labeled_fiction_graphic", "claim_type": "FICTION", "uses_third_party_art": False, "clearly_labeled_as_illustration": True} for n in range(1, 6)]
+        idea["media_feasibility"] = score_media_feasibility(scene_plan)
+        idea["media_feasibility_score"] = idea["media_feasibility"]["score"]
+        idea["production_priority_score"] = story_strategy.production_priority_score(idea["storytelling_score"], idea["viral_potential_score"], idea["media_feasibility_score"])
+        idea["combined_priority_score"] = idea["production_priority_score"]
         idea["qualified_for_shortlist"] = decision["eligible"] and idea["storytelling_score"] >= policy["storytelling_score"]["minimum"]
         idea["claim_note"] = "Composite fictional scenario; not a report of a real match."
+    selection = story_strategy.choose_production_topic(ideas)
+    ideas = selection["ranked"] + [item for item in ideas if item not in selection["ranked"]]
+    for item in selection["waiting"]:
+        record_waiting_topic({"title": item["title"], "storytelling_score": item["storytelling_score"], "viral_potential_score": item["viral_potential_score"], "media_feasibility_score": item["media_feasibility_score"]}, out.parent / "topic-backlog.json")
+    if selection["production_blocked"]:
+        save(out / "ideas.json", ideas)
+        checkpoint["phases"].update({"ideas": {"status": "complete", "artifact": "ideas.json"}, "media": {"status": "waiting_for_media", "backlog": "../topic-backlog.json", "reason": "No Story-qualified topic meets the configured Media Feasibility threshold."}})
+        checkpoint["status"] = "WAITING_FOR_MEDIA"
+        checkpoint["director"] = {"status": "waiting_for_media", "execution": "sequential_checkpointed", "selected_topic": None}
+        save(checkpoint_path, checkpoint)
+        print("No production-ready story met the Media Feasibility threshold; qualified ideas were added to the waiting queue.")
+        return 2
+    selected = selection["selected"]
     script = {
-      "title": ideas[0]["title"], "duration_seconds": 42,
+      "title": selected["title"], "duration_seconds": 42, "claim_type": selected["claim_type"],
+      "source_urls": selected.get("sources", []),
       "voiceover": [
         {"start": 0.0, "end": 4.0, "text": "Anh em biết cái câu: đợi mình farm thêm một món không?"},
         {"start": 4.0, "end": 10.0, "text": "Mình vừa ping: đừng combat nha, xạ thủ còn thiếu đúng một cây kiếm."},
@@ -65,19 +93,19 @@ def run(args):
       ],
       "meme_beat_seconds": 21.0,
       "scenes": [
-        {"start": 0, "end": 4, "visual": "Cận cảnh bảng trang bị còn thiếu một món", "sfx": "nhạc căng nhẹ"},
-        {"start": 4, "end": 10, "visual": "Gameplay: ping lùi và lính đang thấp máu", "sfx": "ping"},
-        {"start": 10, "end": 16, "visual": "Gameplay: đồng đội bất ngờ lao vào", "sfx": "whoosh"},
-        {"start": 16, "end": 21, "visual": "Gameplay: giao tranh nổ trong lúc đang farm", "sfx": "combat SFX"},
-        {"start": 21, "end": 24, "visual": "Reaction meme do người dùng cung cấp", "sfx": "meme SFX; ngắt narration 0,65 giây"},
-        {"start": 24, "end": 34, "visual": "Gameplay: hỗn loạn rồi màn hình hồi sinh", "sfx": "combat giảm dần"},
-        {"start": 34, "end": 42, "visual": "Bảng trang bị hoàn chỉnh, CTA hỏi khán giả", "sfx": "nhạc kết"}
+        {"start": 0, "end": 4, "beat": "HOOK", "visual": "Minh họa một ô trang bị còn thiếu cạnh đợt lính"},
+        {"start": 4, "end": 10, "beat": "SETUP", "visual": "Sơ đồ ping lùi và đợt lính thấp máu"},
+        {"start": 10, "end": 16, "beat": "CONFLICT", "visual": "Sơ đồ mũi tên: đồng đội bất ngờ mở giao tranh"},
+        {"start": 16, "end": 21, "beat": "CLIMAX", "visual": "Sơ đồ diễn biến giao tranh khi xạ thủ còn farm"},
+        {"start": 21, "end": 24, "beat": "MEME", "visual": "Reaction tự vẽ, không dùng meme của creator khác"},
+        {"start": 24, "end": 34, "beat": "PAYOFF", "visual": "Thẻ kết quả hư cấu, không mô phỏng giao diện hồi sinh"},
+        {"start": 34, "end": 42, "beat": "ENDING", "visual": "Infographic kết và câu hỏi khán giả"}
       ]
     }
     save(out / "ideas.json", ideas)
     save(out / "script.json", script)
     save(out / "storyboard.json", {"game": args.game, "scenes": script["scenes"], "format": "1080x1920, 9:16"})
-    save(out / "channel-copy.json", {"tiktok_title": "Farm thêm một món thôi mà combat nổ luôn 😭", "shorts_title": "Đợi farm thêm một món thì combat nổ | Liên Quân", "caption": "Bạn đã từng xin farm thêm rồi combat nổ chưa?", "hashtags": ["#LienQuanMobile", "#Gaming", "#YuzhenChoiGi", "#GameHai"], "thumbnail": "Gameplay giao tranh, nhân vật đang farm, chữ lớn: CÒN 1 MÓN!"})
+    save(out / "channel-copy.json", {"tiktok_title": "Farm thêm một món thôi mà combat nổ luôn 😭", "shorts_title": "Đợi farm thêm một món thì combat nổ | Liên Quân", "caption": "Bạn đã từng xin farm thêm rồi combat nổ chưa?", "hashtags": ["#LienQuanMobile", "#Gaming", "#YuzhenChoiGi", "#GameHai"], "thumbnail": "Original illustrated farm-versus-teamfight diagram, labeled as illustration; text: CÒN 1 MÓN!"})
     checkpoint["phases"].update({"ideas": {"status": "complete", "artifact": "ideas.json"}, "script": {"status": "complete", "artifact": "script.json"}, "storyboard": {"status": "complete", "artifact": "storyboard.json"}, "channel_manager": {"status": "complete", "artifact": "channel-copy.json"}})
     settings = json.loads((ROOT / "config/defaults.json").read_text())
 
@@ -94,16 +122,26 @@ def run(args):
         checkpoint["phases"]["voice"] = {"status": "blocked", "reason": "Piper executable and/or vi_VN-vais1000-medium ONNX model plus JSON config unavailable.", "readiness": inspect_voice()}
 
     gameplay = ROOT / "assets/user/gameplay.mp4"
-    checkpoint["phases"]["render"] = {"status": "blocked", "missing": []}
-    if not gameplay.exists(): checkpoint["phases"]["render"]["missing"].append(str(gameplay.relative_to(ROOT)))
-    if not voice or not voice.exists() or checkpoint["phases"]["voice"].get("status") not in ("validated", "generated"): checkpoint["phases"]["render"]["missing"].append("validated voice WAV")
-    if checkpoint["phases"]["render"]["missing"]:
-        checkpoint["phases"]["render"]["reason"] = "Rendering requires rights-cleared gameplay and a real voice WAV; no MP4 was claimed."
-    else:
-        rendered = render_video(gameplay, voice, out, script, settings)
+    rights_file = ROOT / "assets/user/media-rights.json"
+    rights_record = json.loads(rights_file.read_text(encoding="utf-8")) if rights_file.is_file() else {}
+    gameplay_rights = (rights_record.get("assets") or {}).get("gameplay.mp4", {})
+    gameplay_authorized = gameplay.exists() and classify_source(gameplay_rights).get("status") == "AUTHORIZED"
+    authorized_optional_audio = {
+        filename for filename in ("meme-sfx.wav", "music.wav")
+        if classify_source((rights_record.get("assets") or {}).get(filename, {})).get("status") == "AUTHORIZED"
+    }
+    if not voice or not voice.exists() or checkpoint["phases"]["voice"].get("status") not in ("validated", "generated"):
+        checkpoint["phases"]["render"] = {"status": "blocked", "reason": "A real, ffprobe-validated voice WAV is required."}
+    elif gameplay_authorized:
+        rendered = render_video(gameplay, voice, out, script, settings, authorized_optional_audio=authorized_optional_audio)
         checkpoint["phases"]["render"] = rendered
         if rendered["status"] == "rendered":
             checkpoint["phases"]["quality_control"] = quality_control(out / "video.mp4", script["duration_seconds"] + settings["meme_pause_seconds"])
+    else:
+        rendered = render_original_graphics(script, voice, out, load_style(DEFAULT_STYLE))
+        checkpoint["phases"]["render"] = {**rendered, "status": "rendered" if rendered.get("status") == "rendered" else rendered.get("status"), "media_mode": "ORIGINAL_GRAPHICS_FALLBACK"}
+        if rendered.get("status") == "rendered":
+            checkpoint["phases"]["quality_control"] = quality_control(out / "video.mp4", rendered["duration_seconds"])
     checkpoint["status"] = "checkpoint_saved"
     checkpoint["director"] = {
         "status": "complete_with_blocked_phases" if checkpoint["phases"].get("render", {}).get("status") == "blocked" or checkpoint["phases"].get("voice", {}).get("status") == "blocked" else "complete",
@@ -129,7 +167,7 @@ def srt_time(seconds):
     return f"{h:02}:{m:02}:{s:02},{ms:03}"
 
 
-def render_video(gameplay, voice, out, script, settings):
+def render_video(gameplay, voice, out, script, settings, *, authorized_optional_audio=()):
     ffmpeg = shutil.which("ffmpeg")
     if not ffmpeg:
         return {"status": "blocked", "reason": "ffmpeg unavailable"}
@@ -146,8 +184,10 @@ def render_video(gameplay, voice, out, script, settings):
     sfx = ROOT / "assets/user/meme-sfx.wav"
     music = ROOT / "assets/user/music.wav"
     inputs = ["-i", str(gameplay), "-i", str(voice)]
-    if sfx.exists(): inputs += ["-i", str(sfx)]
-    if music.exists(): inputs += ["-i", str(music)]
+    include_sfx = sfx.exists() and "meme-sfx.wav" in authorized_optional_audio
+    include_music = music.exists() and "music.wav" in authorized_optional_audio
+    if include_sfx: inputs += ["-i", str(sfx)]
+    if include_music: inputs += ["-i", str(music)]
     # Keep the source game capture intact apart from proportional crop/scale to the requested canvas.
     subtitle_path = str(srt).replace("\\", "/").replace(":", r"\:").replace("'", r"\'")
     width, height = settings["target_width"], settings["target_height"]
@@ -155,12 +195,12 @@ def render_video(gameplay, voice, out, script, settings):
     audio_parts = [f"[1:a]aresample=48000,aformat=sample_fmts=fltp:channel_layouts=stereo,atrim=start=0:end={pause_at},asetpts=PTS-STARTPTS[before];anullsrc=channel_layout=stereo:sample_rate=48000:d={pause_duration}[gap];[1:a]aresample=48000,aformat=sample_fmts=fltp:channel_layouts=stereo,atrim=start={pause_at},asetpts=PTS-STARTPTS[after];[before][gap][after]concat=n=3:v=0:a=1[voice]"]
     mix = "[voice]"
     next_input = 2
-    if sfx.exists():
+    if include_sfx:
         delay = round(pause_at * 1000)
         audio_parts.append(f"[{next_input}:a]adelay={delay}|{delay},volume=1[sfx]")
         mix = "[voice][sfx]"
         next_input += 1
-    if music.exists():
+    if include_music:
         audio_parts.append(f"[{next_input}:a]volume=0.12[music]")
         mix += "[music]"
     if len(mix) > len("[voice]"):
@@ -175,7 +215,7 @@ def render_video(gameplay, voice, out, script, settings):
     result = subprocess.run(cmd, capture_output=True, text=True)
     if result.returncode or not target.exists():
         return {"status": "failed", "detail": result.stderr[-1500:]}
-    return {"status": "rendered", "artifact": str(target.relative_to(ROOT)), "meme_pause_seconds": pause_duration, "sfx_included": sfx.exists(), "music_included": music.exists()}
+    return {"status": "rendered", "artifact": str(target.relative_to(ROOT)), "meme_pause_seconds": pause_duration, "sfx_included": include_sfx, "music_included": include_music}
 
 
 def quality_control(video, expected_duration):

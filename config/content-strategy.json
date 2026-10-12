@@ -17,12 +17,23 @@
       "curiosity_hook": 20,
       "emotion_debate": 15,
       "gaming_community_fit": 10,
-      "rights_cleared_media_feasibility": 10
+      "narrative_originality_and_clarity": 10
     }
   },
+  "media_feasibility": {
+    "production_minimum": 70,
+    "scene_values": {
+      "authorized_asset": 100,
+      "fact_grounded_original_graphic": 85,
+      "review_required_asset": 25,
+      "missing": 0
+    },
+    "note": "Separate production-readiness estimate; never use as trend, popularity, or legal-rights evidence. Original graphics must be fact-grounded and labeled when depicting a real event."
+  },
   "ranking": {
-    "storytelling_score_weight": 0.7,
-    "viral_potential_score_weight": 0.3,
+    "storytelling_score_weight": 0.5,
+    "viral_potential_score_weight": 0.2,
+    "media_feasibility_score_weight": 0.3,
     "hot_score_role": "verified_tiebreaker_only",
     "viral_score_is_prediction": false
   },

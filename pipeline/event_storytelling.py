@@ -60,6 +60,56 @@ def _gradient(size: tuple[int, int], top: str, bottom: str) -> Image.Image:
     return strip.resize((width, height))
 
 
+def _draw_diagram(draw: ImageDraw.ImageDraw, diagram: dict, style: dict) -> None:
+    """Draw authored editorial diagrams; never use a game map or reconstruct footage."""
+    items = diagram.get("items", [])
+    if not items:
+        return
+    cyan, gold = style["palette"]["cyan"], style["palette"]["highlight"]
+    white, muted = style["palette"]["white"], style["palette"]["muted"]
+    label_font = _font(style["typography"]["font_bold"], 27)
+    value_font = _font(style["typography"]["font_bold"], 48)
+    y = 900
+    if diagram.get("kind") == "series_score":
+        draw.rounded_rectangle((145, y, 935, y + 174), radius=32, fill=(22, 88, 138, 238), outline=(87, 217, 255, 255), width=3)
+        column_x = (185, 585)
+        for index, item in enumerate(items[:2]):
+            draw.text((column_x[index], y + 28), item["label"], font=label_font, fill=muted)
+            draw.text((column_x[index], y + 78), item["value"], font=value_font, fill=gold if index == 1 else white)
+        return
+    if diagram.get("kind") == "battle_flow":
+        x0, x1 = 190, 890
+        center_y = y + 83
+        draw.line((x0, center_y, x1, center_y), fill=(87, 217, 255, 170), width=6)
+        step = (x1 - x0) / max(len(items) - 1, 1)
+        for index, item in enumerate(items):
+            x = round(x0 + step * index)
+            draw.ellipse((x - 25, center_y - 25, x + 25, center_y + 25), fill=gold if index == len(items) - 1 else cyan)
+            text = item["label"]
+            box = draw.textbbox((0, 0), text, font=label_font)
+            tw = box[2] - box[0]
+            left = max(116, min(964 - tw, x - tw // 2))
+            draw.text((left, center_y - 83), text, font=label_font, fill=white)
+            detail = item.get("detail", "")
+            if detail:
+                db = draw.textbbox((0, 0), detail, font=label_font)
+                draw.text((max(116, min(964 - (db[2] - db[0]), x - (db[2] - db[0]) // 2)), center_y + 43), detail, font=label_font, fill=muted)
+        return
+    # event_timeline and series_progress share a restrained milestone track.
+    x0, x1 = 188, 892
+    center_y = y + 78
+    draw.line((x0, center_y, x1, center_y), fill=(87, 217, 255, 170), width=6)
+    step = (x1 - x0) / max(len(items) - 1, 1)
+    for index, item in enumerate(items):
+        x = round(x0 + step * index)
+        draw.ellipse((x - 17, center_y - 17, x + 17, center_y + 17), fill=gold if index == len(items) - 1 else cyan)
+        label = item.get("label", "")
+        text = item.get("value", "")
+        draw.text((x - 100, center_y - 83), label[:22], font=label_font, fill=muted)
+        if text:
+            draw.text((x - 100, center_y + 38), text[:22], font=label_font, fill=white)
+
+
 def render_card(scene: dict, index: int, count: int, destination: Path, style: dict) -> Path:
     """Draw one original 9:16 information card with safe margins and callouts."""
     w, h = style["canvas"]["width"], style["canvas"]["height"]
@@ -79,6 +129,7 @@ def render_card(scene: dict, index: int, count: int, destination: Path, style: d
         image = backdrop.convert("RGBA")
     else:
         image = _gradient((w, h), palette["background"], "#10283B").convert("RGBA")
+    backdrop_image = image.copy()
     draw = ImageDraw.Draw(image, "RGBA")
     # A self-authored orbital motif gives the cards slow-motion texture without
     # importing game UI, logos, screenshots, or third-party artwork.
@@ -108,6 +159,10 @@ def render_card(scene: dict, index: int, count: int, destination: Path, style: d
     micro = _font(style["typography"]["font_bold"], 28)
     x = 116
     draw.text((x, 205), scene.get("kicker", "YUZHEN EVENT BRIEF"), font=small, fill=palette["cyan"])
+    if scene.get("disclosure"):
+        disclosure_font = _font(style["typography"]["font_bold"], 19)
+        draw.rounded_rectangle((116, 266, 964, 316), radius=20, fill=(16, 40, 59, 245), outline=(255, 214, 107, 225), width=2)
+        draw.text((140, 279), scene["disclosure"], font=disclosure_font, fill=palette["highlight"])
 
     # Blue header card with one highlighted keyword, kept in the title safe zone.
     y_title = 350
@@ -134,12 +189,15 @@ def render_card(scene: dict, index: int, count: int, destination: Path, style: d
         image.alpha_composite(source_image, (overlay_x, overlay_y))
         draw = ImageDraw.Draw(image, "RGBA")
 
+    if scene.get("diagram"):
+        _draw_diagram(draw, scene["diagram"], style)
+
     # Scene-specific compact fact/callout panel.
     callout = scene.get("callout")
     if callout:
-        cy = min(max(body_y + 62, 1230), 1480)
-        draw.rounded_rectangle((116, cy, w - 116, cy + 210), radius=34,
-                               fill=(22, 143, 232, 60), outline=(87, 217, 255, 175), width=3)
+        cy = min(max(body_y + 62, 1130), 1270)
+        draw.rounded_rectangle((116, cy, w - 116, cy + 150), radius=34,
+                               fill=(16, 40, 59, 245), outline=(87, 217, 255, 230), width=3)
         callout_lines = _wrap(draw, callout, small, w - 288)
         for j, line in enumerate(callout_lines[:3]):
             draw.text((154, cy + 48 + 44 * j), line, font=small, fill=palette["highlight"])
@@ -152,12 +210,13 @@ def render_card(scene: dict, index: int, count: int, destination: Path, style: d
     draw.rounded_rectangle((116, footer_y + 52, progress_x, footer_y + 66), radius=7, fill=palette["cyan"])
 
     destination.parent.mkdir(parents=True, exist_ok=True)
-    image.convert("RGB").save(destination, format="PNG", optimize=True)
+    Image.alpha_composite(backdrop_image, image).convert("RGB").save(destination, format="PNG", optimize=True)
     return destination
 
 
 def render_video(cards: list[Path], durations: list[float], audio: Path, subtitles: Path,
-                 output: Path, style: dict) -> dict:
+                 output: Path, style: dict, *, audio_tail_pad_seconds: float = 0.0,
+                 pause_at_seconds: float | None = None, pause_duration_seconds: float = 0.0) -> dict:
     """Animate each card with a restrained zoom/pan and crossfade, then mux voice/captions."""
     output = Path(output)
     if output.exists():
@@ -205,13 +264,107 @@ def render_video(cards: list[Path], durations: list[float], audio: Path, subtitl
     ass_margin = round(style["safe_area"]["bottom"] * scale)
     force_style = f"FontName=Noto Sans,FontSize={ass_size},PrimaryColour=&H00FFFFFF,OutlineColour=&H00152207,BorderStyle=1,Outline={ass_outline:.2f},Shadow=0,Alignment=2,MarginV={ass_margin}"
     filters.append(f"[{current}]subtitles='{sub_path}':force_style='{force_style}'[vout]")
-    command += ["-filter_complex", ";".join(filters), "-map", "[vout]", "-map", f"{len(cards)}:a:0",
-                "-t", f"{sum(durations):.4f}", "-r", str(fps), "-c:v", "libx264", "-preset", "medium",
+    audio_index = len(cards)
+    if pause_at_seconds is not None and pause_duration_seconds > 0:
+        filters.append(f"[{audio_index}:a]aresample=48000,aformat=sample_fmts=fltp:channel_layouts=stereo,atrim=start=0:end={pause_at_seconds},asetpts=PTS-STARTPTS[voicebefore]")
+        filters.append(f"anullsrc=channel_layout=stereo:sample_rate=48000:d={pause_duration_seconds}[voicegap]")
+        filters.append(f"[{audio_index}:a]aresample=48000,aformat=sample_fmts=fltp:channel_layouts=stereo,atrim=start={pause_at_seconds},asetpts=PTS-STARTPTS[voiceafter]")
+        filters.append("[voicebefore][voicegap][voiceafter]concat=n=3:v=0:a=1[voicejoined]")
+        audio_source = "[voicejoined]"
+    else:
+        audio_source = f"[{audio_index}:a:0]"
+    if audio_tail_pad_seconds > 0:
+        filters.append(f"{audio_source}apad=pad_dur={audio_tail_pad_seconds:.4f}[audioout]")
+        audio_map = "[audioout]"
+    elif pause_at_seconds is not None and pause_duration_seconds > 0:
+        audio_map = audio_source
+    else:
+        audio_map = f"{audio_index}:a:0"
+    command += ["-filter_complex", ";".join(filters), "-map", "[vout]", "-map", audio_map]
+    command += ["-t", f"{sum(durations):.4f}", "-r", str(fps), "-c:v", "libx264", "-preset", "medium",
                 "-crf", "20", "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart", str(output)]
     result = subprocess.run(command, capture_output=True, text=True)
     if result.returncode or not output.is_file() or output.stat().st_size == 0:
         return {"status": "failed", "detail": result.stderr[-3000:]}
     return {"status": "rendered", "path": str(output), "duration_seconds": sum(durations), "width": width, "height": height, "fps": fps}
+
+
+def render_original_graphics(script: dict, audio: Path, output_dir: Path, style: dict | None = None) -> dict:
+    """Fallback renderer: source-bound original diagrams, explicitly not gameplay."""
+    output_dir, audio = Path(output_dir), Path(audio)
+    output = output_dir / "video.mp4"
+    storyboard_path = output_dir / "editorial-storyboard.json"
+    subtitles = output_dir / "subtitles.srt"
+    card_dir = output_dir / "scene-cards"
+    if any(path.exists() for path in (output, storyboard_path, subtitles, card_dir)):
+        return {"status": "refused", "reason": "Existing output detected; preserving it.", "path": str(output)}
+    if not script.get("scenes") or not script.get("voiceover") or not audio.is_file():
+        return {"status": "blocked", "reason": "Original-graphics rendering needs timed scenes, captions, and a real voice WAV."}
+    style = style or load_style()
+    probe = shutil.which("ffprobe")
+    if not probe:
+        return {"status": "blocked", "reason": "ffprobe unavailable; voice duration cannot be measured."}
+    check = subprocess.run([probe, "-v", "error", "-show_entries", "format=duration", "-of", "default=nw=1:nk=1", str(audio)], capture_output=True, text=True)
+    try:
+        voice_duration = float(check.stdout.strip())
+    except ValueError:
+        voice_duration = 0
+    if check.returncode or voice_duration <= 0:
+        return {"status": "blocked", "reason": "Voice WAV failed duration inspection."}
+    target_duration = max(float(style["canvas"]["duration_min_seconds"]), voice_duration)
+    if target_duration > float(style["canvas"]["duration_max_seconds"]):
+        return {"status": "blocked", "reason": f"Measured voice is {voice_duration:.2f}s, above the {style['canvas']['duration_max_seconds']}s format limit."}
+    planned_duration = float(script.get("duration_seconds", 0))
+    if planned_duration <= 0:
+        return {"status": "blocked", "reason": "Script has no positive target duration for subtitle timing."}
+    time_scale = voice_duration / planned_duration
+    scenes = []
+    for index, scene in enumerate(script["scenes"], 1):
+        start = float(scene["start"]) * time_scale
+        end = float(scene["end"]) * time_scale
+        label = scene.get("beat", f"CẢNH {index:02d}")
+        visual = scene.get("visual", "Minh họa biên tập")
+        scenes.append({
+            "start": start, "end": end, "beat": label,
+            "title": label.replace("_", " ").upper(),
+            "body": visual,
+            "callout": "TÌNH HUỐNG HƯ CẤU · ĐỒ HỌA TỰ TẠO" if script.get("claim_type") == "FICTION" else "MINH HỌA BIÊN TẬP · KHÔNG PHẢI GAMEPLAY",
+            "disclosure": "MINH HỌA · KHÔNG PHẢI GAMEPLAY",
+            "diagram": {"kind": "event_timeline", "items": [
+                {"label": f"NHỊP {index}", "value": label[:20]},
+                {"label": "LỜI KỂ", "value": visual[:20]},
+            ]},
+            "source": "ORIGINAL GRAPHIC · FACT STATUS IN CHECKPOINT",
+        })
+    hold = max(0.0, target_duration - voice_duration)
+    if hold:
+        scenes.append({"start": voice_duration, "end": target_duration, "beat": "END_CARD_HOLD", "title": "YUZHEN CHƠI GÌ", "body": "Kể chuyện game · Chờ bạn bình luận", "callout": "ĐỒ HỌA GỐC", "disclosure": "MINH HỌA · KHÔNG PHẢI GAMEPLAY", "source": "ORIGINAL GRAPHIC"})
+    source_lines = script.get("source_urls", [])
+    if script.get("claim_type") not in {"FICTION", "FAN_THEORY"} and not source_lines:
+        return {"status": "blocked", "reason": "Factual original graphics require verifiable source URLs."}
+    output_dir.mkdir(parents=True, exist_ok=True)
+    storyboard_path.write_text(json.dumps({"claim_type": script.get("claim_type", "FICTION"), "visual_mode": "ORIGINAL_EDITORIAL_GRAPHICS", "do_not_present_graphics_as_gameplay": True, "source_urls": source_lines, "scenes": scenes}, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    def timestamp(value: float) -> str:
+        ms = round(value * 1000)
+        h, ms = divmod(ms, 3600000)
+        m, ms = divmod(ms, 60000)
+        s, ms = divmod(ms, 1000)
+        return f"{h:02}:{m:02}:{s:02},{ms:03}"
+    rows = []
+    for i, line in enumerate(script["voiceover"], 1):
+        rows.append(f"{i}\n{timestamp(float(line['start']) * time_scale)} --> {timestamp(float(line['end']) * time_scale)}\n{line['text']}\n")
+    subtitles.write_text("\n".join(rows), encoding="utf-8")
+    cards, durations = [], []
+    for index, scene in enumerate(scenes, 1):
+        card = card_dir / f"card-{index:02d}.png"
+        render_card(scene, index, len(scenes), card, style)
+        cards.append(card)
+        durations.append(scene["end"] - scene["start"])
+    tail = max(0.0, target_duration - voice_duration)
+    result = render_video(cards, durations, audio, subtitles, output, style, audio_tail_pad_seconds=tail)
+    if result.get("status") != "rendered":
+        return result
+    return {**result, "visual_mode": "ORIGINAL_EDITORIAL_GRAPHICS", "duration_seconds": target_duration, "human_review_required": ["Confirm timed captions against the narration", "Approve the illustration-only visual style"], "sfx_included": False, "music_included": False}
 
 
 def main(argv: list[str] | None = None) -> int:

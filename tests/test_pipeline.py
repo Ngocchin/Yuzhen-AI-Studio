@@ -90,6 +90,40 @@ class StudioPipelineTests(unittest.TestCase):
             self.assertEqual(len(json.loads((output / "ideas.json").read_text())), 3)
             self.assertEqual(checkpoint["director"]["execution"], "sequential_checkpointed")
 
+    def test_new_production_keeps_an_existing_checkpoint_and_script(self):
+        with tempfile.TemporaryDirectory() as temp, patch.object(studio, "ROOT", Path(temp)):
+            root = Path(temp)
+            existing = root / "outputs/lien-quan-mobile"
+            existing.mkdir(parents=True)
+            preserved_checkpoint = {"mode": "ENTERTAINMENT", "production_id": "Production #001"}
+            (existing / "checkpoint.json").write_text(json.dumps(preserved_checkpoint))
+            (existing / "script.json").write_text('{"title":"keep me"}')
+            (root / "config").mkdir()
+            (root / "config/defaults.json").write_text(json.dumps({"target_width": 1080, "target_height": 1920, "fps": 30, "meme_pause_seconds": 0.65}))
+            with patch.object(studio, "inspect_voice", return_value={"ready": False, "reason": "test fixture"}):
+                studio.run(Namespace(game="Liên Quân Mobile", mode="ENTERTAINMENT", voice=None))
+            self.assertEqual(json.loads((existing / "checkpoint.json").read_text()), preserved_checkpoint)
+            self.assertEqual(json.loads((existing / "script.json").read_text())["title"], "keep me")
+            self.assertTrue((root / "outputs/lien-quan-mobile-production-002/checkpoint.json").exists())
+
+    def test_public_or_unlicensed_gameplay_is_not_used_when_graphic_fallback_is_possible(self):
+        with tempfile.TemporaryDirectory() as temp, patch.object(studio, "ROOT", Path(temp)):
+            root = Path(temp)
+            (root / "config").mkdir()
+            (root / "config/defaults.json").write_text(json.dumps({"target_width": 1080, "target_height": 1920, "fps": 30, "meme_pause_seconds": 0.65}))
+            (root / "assets/user").mkdir(parents=True)
+            (root / "assets/user/gameplay.mp4").write_bytes(b"unlicensed placeholder")
+            voice_path = root / "approved.wav"
+            with wave.open(str(voice_path), "wb") as wav:
+                wav.setnchannels(1)
+                wav.setsampwidth(2)
+                wav.setframerate(22050)
+                wav.writeframes(b"\0\0" * 22050)
+            with patch.object(studio, "render_original_graphics", return_value={"status": "rendered", "duration_seconds": 35.0}) as graphic, patch.object(studio, "render_video") as gameplay_render:
+                studio.run(Namespace(game="Liên Quân Mobile", mode="ENTERTAINMENT", voice=str(voice_path)))
+            graphic.assert_called_once()
+            gameplay_render.assert_not_called()
+
     def test_generated_voice_is_accepted_for_render(self):
         with tempfile.TemporaryDirectory() as temp, patch.object(studio, "ROOT", Path(temp)):
             root = Path(temp)
@@ -97,6 +131,15 @@ class StudioPipelineTests(unittest.TestCase):
             (root / "config/defaults.json").write_text(json.dumps({"target_width": 1080, "target_height": 1920, "fps": 30, "meme_pause_seconds": 0.65}))
             (root / "assets/user").mkdir(parents=True)
             (root / "assets/user/gameplay.mp4").write_bytes(b"test fixture")
+            (root / "assets/user/media-rights.json").write_text(json.dumps({"assets": {"gameplay.mp4": {
+                "source_url": "https://owner.example/clip",
+                "owner": "User recording owner",
+                "rights_evidence": {
+                    "basis": "user_ownership", "permitted_platforms": ["youtube", "tiktok"],
+                    "commercial_use": True, "editing_allowed": True,
+                    "underlying_rights_cleared": True, "scope": "Edited clips for this channel",
+                },
+            }}}))
             def synthesize_fixture(_text, output):
                 with wave.open(str(output), "wb") as wav:
                     wav.setnchannels(1)
@@ -191,7 +234,7 @@ class StudioPipelineTests(unittest.TestCase):
             subprocess.run([ffmpeg, "-y", "-f", "lavfi", "-i", "sine=frequency=880:duration=0.25", str(sfx)], check=True, capture_output=True)
             script = {"duration_seconds": 1.3, "meme_beat_seconds": 0.5, "voiceover": [{"start": 0, "end": 0.5, "text": "Xin chào"}, {"start": 0.5, "end": 1.3, "text": "Đang giao tranh"}]}
             settings = {"target_width": 1080, "target_height": 1920, "fps": 12, "meme_pause_seconds": 0.2}
-            rendered = studio.render_video(gameplay, voice, root / "outputs/sample", script, settings)
+            rendered = studio.render_video(gameplay, voice, root / "outputs/sample", script, settings, authorized_optional_audio={"meme-sfx.wav"})
             self.assertEqual(rendered["status"], "rendered", rendered)
             qc = studio.quality_control(root / "outputs/sample/video.mp4", 1.5)
             self.assertEqual(qc["status"], "passed", qc)

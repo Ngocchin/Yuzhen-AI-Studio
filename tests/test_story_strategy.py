@@ -1,6 +1,6 @@
 import unittest
 
-from pipeline.story_strategy import classify_claim, load_config, rank_score, storytelling_score, topic_decision
+from pipeline.story_strategy import choose_production_topic, classify_claim, load_config, rank_score, storytelling_score, topic_decision
 
 
 class StoryStrategyTests(unittest.TestCase):
@@ -32,9 +32,28 @@ class StoryStrategyTests(unittest.TestCase):
             classify_claim("unsupported lore", "CANON", has_sources=False)
 
     def test_scoring_threshold_and_rank_weights(self):
-        self.assertEqual(storytelling_score({"story_appeal": 25, "conflict_mystery_climax": 20, "curiosity_hook": 20, "emotion_debate": 15, "gaming_community_fit": 10, "rights_cleared_media_feasibility": 10}), 100)
-        self.assertEqual(rank_score(80, 60), 74.0)
+        self.assertEqual(storytelling_score({"story_appeal": 25, "conflict_mystery_climax": 20, "curiosity_hook": 20, "emotion_debate": 15, "gaming_community_fit": 10, "narrative_originality_and_clarity": 10}), 100)
+        self.assertEqual(rank_score(80, 60, 100), 82.0)
+        self.assertEqual(rank_score(100, 100, 0), 70.0)
         self.assertEqual(load_config()["storytelling_score"]["minimum"], 75)
+        self.assertNotIn("media_feasibility", load_config()["storytelling_score"]["weights"])
+
+    def test_media_feasibility_is_not_in_storytelling_or_viral_weights(self):
+        ranking = load_config()["ranking"]
+        self.assertAlmostEqual(sum(ranking[key] for key in ("storytelling_score_weight", "viral_potential_score_weight", "media_feasibility_score_weight")), 1.0)
+        self.assertFalse(load_config()["ranking"]["viral_score_is_prediction"])
+
+    def test_production_selector_prefers_feasible_topic_and_waitlists_blocked_story(self):
+        feasible = {"title": "Original diagram story", "qualified_for_shortlist": True, "storytelling_score": 80, "viral_potential_score": 65, "media_feasibility_score": 85, "production_priority_score": 78.5, "media_feasibility": {"production_ready_estimate": True}}
+        blocked = {"title": "Needs broadcast clip", "qualified_for_shortlist": True, "storytelling_score": 96, "viral_potential_score": 98, "media_feasibility_score": 25, "production_priority_score": 75.3, "media_feasibility": {"production_ready_estimate": False}}
+        selected = choose_production_topic([blocked, feasible])
+        self.assertEqual(selected["selected"]["title"], "Original diagram story")
+        self.assertEqual([item["title"] for item in selected["waiting"]], ["Needs broadcast clip"])
+
+    def test_selector_blocks_when_every_qualified_story_is_unrenderable(self):
+        result = choose_production_topic([{"title": "no assets", "qualified_for_shortlist": True, "storytelling_score": 95, "media_feasibility_score": 10, "media_feasibility": {"production_ready_estimate": False}}])
+        self.assertTrue(result["production_blocked"])
+        self.assertIsNone(result["selected"])
 
     def test_min_quan_is_required_voice(self):
         config = load_config()["voice"]
