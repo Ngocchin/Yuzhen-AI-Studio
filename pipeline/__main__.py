@@ -14,8 +14,67 @@ from pipeline.media_feasibility import score_media_feasibility
 from pipeline.topic_queue import record_waiting_topic
 from pipeline.media_sources import classify_source
 from pipeline.event_storytelling import DEFAULT_STYLE, load_style, render_original_graphics
+from pipeline.real_footage import preflight_real_footage
+from pipeline.topic_queue import DEFAULT_SOURCE_LEDGER, filter_previously_rejected, record_source_decision
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+def run_real_footage(args):
+    """Run a separate real-footage-first preflight without touching older outputs."""
+    output = Path(getattr(args, "output_dir", None) or ROOT / "outputs/production-004-real-footage")
+    output = output if output.is_absolute() else ROOT / output
+    storyboard_path = Path(getattr(args, "storyboard", None) or ROOT / "outputs/production-004/storyboard.json")
+    storyboard_path = storyboard_path if storyboard_path.is_absolute() else ROOT / storyboard_path
+    candidates_path = Path(getattr(args, "candidates", None) or output / "candidates.json")
+    candidates_path = candidates_path if candidates_path.is_absolute() else ROOT / candidates_path
+    mode = getattr(args, "output_mode", "SAFE")
+    targets = [output / name for name in ("edit-plan.json", "edit-plan.md", "checkpoint.json")]
+    existing = [str(path) for path in targets if path.exists()]
+    if existing:
+        print(f"Refusing to overwrite real-footage checkpoint artifacts: {existing}")
+        return 2
+    if not storyboard_path.is_file() or not candidates_path.is_file():
+        print("REAL_FOOTAGE_FIRST requires existing storyboard and candidate-manifest files.")
+        return 2
+    story = json.loads(storyboard_path.read_text(encoding="utf-8"))
+    manifest = json.loads(candidates_path.read_text(encoding="utf-8"))
+    candidates = manifest.get("candidates", [])
+    ledger = json.loads(DEFAULT_SOURCE_LEDGER.read_text(encoding="utf-8")) if DEFAULT_SOURCE_LEDGER.exists() else {"rejected_source_keys": []}
+    candidates = filter_previously_rejected(candidates, ledger)
+    result = preflight_real_footage(
+        story.get("scenes", []), candidates, mode=mode, production_dir=ROOT,
+        expected_game=manifest.get("game", "Arena of Valor"),
+    )
+    output.mkdir(parents=True, exist_ok=True)
+    result["production_id"] = manifest.get("production_id", "Production #004")
+    result["source_candidate_count"] = len(candidates)
+    (output / "edit-plan.json").write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    lines = ["# Production #004 — REAL_FOOTAGE_FIRST edit plan", "", f"**Mode:** {mode}", f"**Status:** {result['status']}", "", "| Scene | Candidate | Footage URL | Timecode | Rights | Confidence | Match |", "|---|---|---|---|---|---|---|"]
+    for row in result["scene_matches"]:
+        tc = row.get("timecode")
+        tc_text = f"{tc['in_seconds']:.2f}–{tc['out_seconds']:.2f}s" if tc else "Not verified"
+        lines.append("| {scene} | {candidate} | {url} | {tc} | {rights} | {confidence} | {match} |".format(
+            scene=row.get("scene_id", ""), candidate=row.get("title") or row.get("candidate_id") or "—",
+            url=row.get("url") or "—", tc=tc_text, rights=row.get("rights_status") or "—",
+            confidence=row.get("confidence", "NONE"), match=(row.get("editorial_match") or row.get("missing_reason", "")).replace("|", "/"),
+        ))
+    lines += ["", "No clip is rendered from discovery metadata. A local library file, verified scene/game identity, rights evidence, and reviewed timecode are required.", ""]
+    (output / "edit-plan.md").write_text("\n".join(lines), encoding="utf-8")
+    for candidate in candidates:
+        decision = classify_source(candidate)
+        if candidate.get("source_url"):
+            record_source_decision(candidate["source_url"], decision["status"], decision["reason"])
+    checkpoint = {
+        "production_id": result["production_id"], "mode": "REAL_FOOTAGE_FIRST", "output_mode": mode,
+        "status": result["status"], "may_render": result["may_render"],
+        "voice_source": "../production-004/voice-minh-quan.wav (existing, unchanged)",
+        "previous_production_preserved": True,
+        "phases": {"candidate_search": "complete", "rights_preflight": result["status"], "render": "blocked_missing_permitted_footage" if not result["may_render"] else "ready"},
+    }
+    (output / "checkpoint.json").write_text(json.dumps(checkpoint, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    print(f"REAL_FOOTAGE_FIRST: {result['status']}; candidates={len(candidates)}; missing scenes={len(result['missing_scene_ids'])}")
+    return 0 if result["may_render"] else 2
 
 
 def slugify(value):
@@ -25,6 +84,8 @@ def slugify(value):
 
 
 def run(args):
+    if args.mode == "REAL_FOOTAGE_FIRST":
+        return run_real_footage(args)
     slug = slugify(args.game)
     out = ROOT / "outputs" / slug
     if out.exists() and any(out.iterdir()):
@@ -242,10 +303,14 @@ def save(path, data):
 def main():
     parser = argparse.ArgumentParser(description="Yuzhen AI Studio local production pipeline")
     sub = parser.add_subparsers(dest="command", required=True)
-    command = sub.add_parser("run", help="produce an entertainment checkpoint or check news mode")
+    command = sub.add_parser("run", help="produce an entertainment checkpoint, check news, or preflight real footage")
     command.add_argument("--game", required=True)
-    command.add_argument("--mode", choices=("ENTERTAINMENT", "NEWS"), default="ENTERTAINMENT")
+    command.add_argument("--mode", choices=("ENTERTAINMENT", "NEWS", "REAL_FOOTAGE_FIRST"), default="ENTERTAINMENT")
     command.add_argument("--voice", help="existing voice WAV")
+    command.add_argument("--storyboard", help="storyboard JSON for REAL_FOOTAGE_FIRST")
+    command.add_argument("--candidates", help="candidate manifest JSON for REAL_FOOTAGE_FIRST")
+    command.add_argument("--output-dir", help="separate real-footage output directory")
+    command.add_argument("--output-mode", choices=("SAFE", "INTERNAL_REVIEW"), default="SAFE")
     args = parser.parse_args()
     sys.exit(run(args))
 

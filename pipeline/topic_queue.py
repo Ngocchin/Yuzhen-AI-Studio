@@ -21,7 +21,7 @@ def source_key(url: str) -> str:
 
 def filter_previously_rejected(sources: list[dict], ledger: dict) -> list[dict]:
     rejected = set(ledger.get("rejected_source_keys", []))
-    return [item for item in sources if source_key(item.get("url", "")) not in rejected]
+    return [item for item in sources if source_key(item.get("url") or item.get("source_url", "")) not in rejected]
 
 
 def record_source_decision(url: str, status: str, reason: str, path: Path = DEFAULT_SOURCE_LEDGER) -> dict:

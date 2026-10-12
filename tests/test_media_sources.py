@@ -21,9 +21,9 @@ class MediaSourceRightsTests(unittest.TestCase):
         }
         self.assertEqual(classify_source(candidate)["status"], "AUTHORIZED")
 
-    def test_public_or_credit_only_video_is_unusable(self):
+    def test_public_or_credit_only_video_requires_review(self):
         candidate = {"source_url": "https://youtube.com/watch?v=public", "owner": "Creator", "platform": "youtube", "rights_evidence": {}}
-        self.assertEqual(classify_source(candidate)["status"], "UNUSABLE")
+        self.assertEqual(classify_source(candidate)["status"], "REVIEW_REQUIRED")
 
     def test_official_account_does_not_imply_reuse_rights(self):
         candidate = {"source_url": "https://youtube.com/watch?v=official", "owner": "Game Publisher", "platform": "youtube", "rights_evidence": {"review_basis": "Official upload; no reuse grant found."}}
@@ -40,10 +40,22 @@ class MediaSourceRightsTests(unittest.TestCase):
                 "scope": "Edited video",
             },
         }
-        self.assertEqual(classify_source(candidate)["status"], "UNUSABLE")
+        self.assertEqual(classify_source(candidate)["status"], "REVIEW_REQUIRED")
 
     def test_explicit_prohibition_or_bypass_is_unusable(self):
         candidate = {"source_url": "https://example.org/a", "owner": "Unknown", "rights_evidence": {"review_basis": "Maybe fair use", "drm_or_access_bypass_required": True}}
+        self.assertEqual(classify_source(candidate)["status"], "UNUSABLE")
+
+    def test_expired_permission_is_unusable(self):
+        candidate = {
+            "source_url": "https://creator.example/video/3", "owner": "Creator",
+            "rights_evidence": {
+                "basis": "license", "license_url": "https://creator.example/license",
+                "expires_at": "2000-01-01T00:00:00Z", "permitted_platforms": ["youtube", "tiktok"],
+                "commercial_use": True, "editing_allowed": True,
+                "underlying_rights_cleared": True, "scope": "Edited vertical commentary",
+            },
+        }
         self.assertEqual(classify_source(candidate)["status"], "UNUSABLE")
 
 

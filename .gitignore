@@ -16,6 +16,8 @@ assets/user/**
 !assets/user/.gitkeep
 assets/library/**
 !assets/library/.gitkeep
+assets/media-library/**
+!assets/media-library/.gitkeep
 outputs/*
 !outputs/.gitkeep
 reports/*
