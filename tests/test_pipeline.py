@@ -24,7 +24,8 @@ class StudioPipelineTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp, patch.object(studio, "ROOT", Path(temp)):
             (Path(temp) / "config").mkdir()
             (Path(temp) / "config/defaults.json").write_text(json.dumps({"target_width": 1080, "target_height": 1920, "fps": 30, "meme_pause_seconds": 0.65}))
-            result = studio.run(Namespace(game="Liên Quân Mobile", mode="ENTERTAINMENT", voice=None))
+            with patch.object(studio, "inspect_voice", return_value={"ready": False, "reason": "test fixture"}):
+                result = studio.run(Namespace(game="Liên Quân Mobile", mode="ENTERTAINMENT", voice=None))
             output = Path(temp) / "outputs/lien-quan-mobile"
             checkpoint = json.loads((output / "checkpoint.json").read_text())
             self.assertEqual(result, 0)
@@ -90,6 +91,22 @@ class StudioPipelineTests(unittest.TestCase):
     def test_model_check_reports_missing_runtime_without_claiming_ready(self):
         result = inspect_voice(model="assets/models/absent.onnx", executable="missing-piper-binary")
         self.assertFalse(result["ready"])
+
+    def test_inspect_discovers_project_venv_engine(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            executable = root / ".venv/bin/piper"
+            model = root / "assets/models/voice.onnx"
+            executable.parent.mkdir(parents=True)
+            model.parent.mkdir(parents=True)
+            executable.write_text("#!/bin/sh\nexit 0\n")
+            executable.chmod(0o755)
+            model.write_bytes(b"test model")
+            Path(str(model) + ".json").write_text("{}")
+            with patch.object(voice, "ROOT", root), patch.dict("os.environ", {"PIPER_BIN": "", "PIPER_MODEL": str(model)}):
+                result = voice.inspect()
+            self.assertTrue(result["ready"])
+            self.assertEqual(result["engine"]["path"], str(executable))
 
     def test_manual_model_import_keeps_artifacts_outside_git(self):
         with tempfile.TemporaryDirectory() as temp:
