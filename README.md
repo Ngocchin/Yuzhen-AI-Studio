@@ -26,11 +26,12 @@ Agent 00 coordinates agents 01–07 through checkpointed phases. Entertainment m
 
 ## Piper voice setup
 
-The voice adapter is `pipeline/voice.py`. It supports runtime discovery, WAV validation, synthesis, and import of manually obtained model files. The project does not automatically download or install engine/model files, because availability and model licenses must be checked at the source and this keeps large binaries out of Git.
+The voice adapter is `pipeline/voice.py`. It supports runtime discovery, WAV validation, synthesis, and manual model import. Run `bash scripts/setup_offline_voice.sh` to install the pinned Linux/Python dependencies into the ignored project `.venv`, download the pinned Vietnamese model files, and verify their digests. Model weights, package caches, the virtual environment, license record, and generated WAVs remain outside Git.
 
-1. Install Piper from its official upstream distribution for your operating system (or use a compatible `piper` executable already on `PATH`).
-2. Obtain the requested `vi_VN-vais1000-medium` `.onnx` model and its matching `.onnx.json` from a publisher that provides it. Independently verify the exact model's license, attribution requirements, and commercial/redistribution permissions. The engine's license does not establish the voice model's license.
-3. Copy both files into the ignored local `assets/models/` directory, named `vi_VN-vais1000-medium.onnx` and `vi_VN-vais1000-medium.onnx.json`. Or import them with an accompanying license text and source reference:
+1. Run the setup script above. It installs Piper TTS 1.8.0 (GPL-3.0-or-later) and its pinned Linux/Python dependencies.
+2. The script downloads `vi_VN-vais1000-medium.onnx`, its `.onnx.json`, and `MODEL_CARD` from the pinned `rhasspy/piper-voices` Hugging Face revision. It verifies the model SHA-256 and config/card Git blob hashes before accepting them.
+3. The Hugging Face repo metadata declares MIT. The model card identifies the VAIS-1000 Vietnamese Speech Synthesis Corpus, with CC BY 4.0, and the IEEE DataPort record identifies the submitter as Truong Do, DOI `10.21227/H2B887`. Preserve `assets/models/MODEL_CARD` and `MODEL-LICENSE.txt`; include attribution to VAIS-1000 and its source when required. Review the full license terms for your intended commercial and redistribution use. Piper engine licensing does not replace voice/data attribution.
+4. To import another copy manually, provide its ONNX file, matching `.onnx.json`, license text, and source reference:
 
    ```sh
    python3 -m pipeline.voice import-model \
@@ -40,7 +41,7 @@ The voice adapter is `pipeline/voice.py`. It supports runtime discovery, WAV val
      --source 'publisher URL or exact source reference'
    ```
 
-4. Check readiness, then synthesize and validate a real WAV:
+5. Check readiness, then synthesize and validate a real WAV:
 
    ```sh
    python3 -m pipeline.voice check
@@ -48,7 +49,17 @@ The voice adapter is `pipeline/voice.py`. It supports runtime discovery, WAV val
    python3 -m pipeline.voice validate outputs/voice-check.wav
    ```
 
-Set `PIPER_BIN` and `PIPER_MODEL` in the untracked local `.env` file if your installation uses other paths; `.env.example` shows the expected keys. A successful synthesis requires the Piper process to exit successfully and ffprobe to find a readable audio stream. The adapter reports blocked/failed states instead of creating placeholder audio.
+The adapter automatically discovers `.venv/bin/piper` and the default model in `assets/models/`. Set `PIPER_BIN` and `PIPER_MODEL` in the untracked local `.env` file only if your installation uses other paths; `.env.example` shows the keys. Synthesis is successful only when Piper exits successfully and ffprobe confirms a non-empty WAV audio stream.
+
+### Reuse in Codex Cloud
+
+For a fresh Cloud environment, add this one-line setup command in the selected environment's **Setup script** field after this repository branch is available there:
+
+```sh
+cd /workspace/Yuzhen-AI-Studio && bash scripts/setup_offline_voice.sh
+```
+
+The script is safe to rerun: it reuses an existing `.venv` and model after checksum verification, and repairs missing/corrupt files. Current Cloud configuration can be changed from the Codex Cloud Environments settings UI; this task cannot write that UI setting. The setup command needs outbound access to PyPI and Hugging Face through the configured proxy.
 
 ## Continue the first production
 
