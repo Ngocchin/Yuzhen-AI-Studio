@@ -5,8 +5,8 @@
     "precision": "fp32",
     "cpu_threads": 2,
     "presets_to_compare": [
-      {"requested_name": "Minh Quân", "expected_current_name": "Hải Đăng", "style_note": "nam miền Bắc, tự nhiên"},
-      {"requested_name": "Anh Khôi", "expected_current_name": "Thiện Minh", "style_note": "nam miền Bắc, kể chuyện"},
+      {"requested_name": "Minh Quân", "expected_current_name": "Minh Quân", "style_note": "nam miền Bắc, tự nhiên"},
+      {"requested_name": "Anh Khôi", "expected_current_name": "Anh Khôi", "style_note": "nam miền Bắc, kể chuyện"},
       {"requested_name": "Đức Trí", "expected_current_name": "Đức Trí", "style_note": "nam miền Nam, đọc truyện"}
     ]
   }

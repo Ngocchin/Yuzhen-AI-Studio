@@ -1,6 +1,7 @@
 .env
 .venv/
 .vieneu-venv/
+.vieneu-371-venv/
 .cache/
 __pycache__/
 *.py[cod]

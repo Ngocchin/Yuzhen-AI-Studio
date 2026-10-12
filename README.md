@@ -55,14 +55,18 @@ The adapter automatically discovers `.venv/bin/piper` and the default model in `
 
 Piper remains the active fallback. VieNeu-TTS v3 Turbo is an independent, CPU/ONNX adapter; install the pinned SDK/model/codec with `bash scripts/setup_vieneu.sh`. It uses a separate `.vieneu-venv`, pinned upstream revisions, and Git-ignored model/cache directories under `assets/models/`. No CUDA GPU is required. The upstream model and codec publish Apache-2.0 terms; attribution is recorded in `THIRD_PARTY-NOTICES.md`.
 
-Check the exact preset roster provided by the installed SDK and generate a three-voice comparison:
+The locked SDK is 3.7.1 because its actual `list_preset_voices()` roster includes the exact male preset IDs `Minh Quân` and `Anh Khôi`. SDK 3.8.3 renames these and only resolves the old names as aliases to different canonical labels, so this project does not use those aliases for the Minh Quân candidate.
+
+Check the exact preset roster and generate the three Minh Quân delivery previews:
 
 ```sh
 .vieneu-venv/bin/python -m pipeline.vieneu_voice voices
-.vieneu-venv/bin/python -m pipeline.vieneu_voice compare
+.vieneu-venv/bin/python -m pipeline.vieneu_voice previews
 ```
 
-Samples are written to a new timestamped folder in `outputs/voice-comparisons/`; existing files are never overwritten. Current SDK 3.8.3 aliases the requested “Minh Quân” to “Hải Đăng” and “Anh Khôi” to “Thiện Minh”; “Đức Trí” is still listed under that name. The adapter resolves aliases only after checking `list_preset_voices()`, records the canonical name in `comparison.json`, and does not use Adam. Listen to the WAVs before changing defaults. To opt in afterward, edit only `config/voice.json`: set `active_engine` to `vieneu` and `selected_vieneu_voice` to the canonical preset you approved. Until then the active engine stays `piper` and no VieNeu preset is selected. No pitch shifting is used.
+Three WAVs are written to `outputs/voice-previews/minh-quan/` only when the installed roster contains that exact preset and identifies it as male. Existing files are never overwritten. Preview delivery modes use the same speaker; SDK 3.7.1 ignores its style parameter, so contrast comes only from punctuation, sentence boundaries, and pauses. There is no speed override, pitch shifting, or SFX in the source WAVs. The profile remains `PENDING_REVIEW`, Piper stays active, and no preset is selected by default. Change `config/voice.json` only after the user gives the approval phrase in `config/voice_profiles/minh-quan.json`.
+
+The unapproved pronunciation dictionary is in `config/pronunciation/game-terms.json`. It makes no dialogue substitutions; terms can receive a spoken override only after a person confirms the intended pronunciation.
 
 The Cloud environment setup command for a fresh task is:
 
@@ -70,7 +74,7 @@ The Cloud environment setup command for a fresh task is:
 cd /workspace/Yuzhen-AI-Studio && bash scripts/setup_vieneu.sh
 ```
 
-The script reinstalls pinned Python dependencies and retrieves the exact model and codec revisions into ignored project paths. It requires access to PyPI and Hugging Face via the configured Cloud network policy. The comparison outputs remain ignored local artifacts and are not committed.
+The script reinstalls the pinned CPU dependencies and retrieves/checksums the exact model and codec revisions into ignored project paths. It requires access to PyPI and Hugging Face via the configured Cloud network policy. Preview outputs remain ignored local artifacts and are not committed.
 
 ### Reuse in Codex Cloud
 

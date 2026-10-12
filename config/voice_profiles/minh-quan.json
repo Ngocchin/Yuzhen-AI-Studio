@@ -1,0 +1,28 @@
+{
+  "profile_name": "Minh Quân",
+  "voice_provider": "VieNeu-TTS v3 Turbo",
+  "sdk_version": "3.7.1",
+  "backend": "onnx-cpu",
+  "preset_id": "Minh Quân",
+  "gender": "male",
+  "language": "vi-VN",
+  "perceived_age": "20-30",
+  "style": "gaming-commentary",
+  "personality": {
+    "clarity": "Vietnamese tones clear; verify by listening",
+    "timbre": "bright, energetic, friendly; do not force a deep tone",
+    "delivery": "conversational storytelling with light humor and situational emphasis",
+    "avoid": ["newsreader delivery", "advertising delivery", "constant flat pacing", "excessive shouting", "pitch shifting"]
+  },
+  "approval_status": "PENDING_REVIEW",
+  "enabled_as_default": false,
+  "active_engine_change_allowed": false,
+  "style_control": {
+    "supported": false,
+    "note": "VieNeu v3.7.1 deprecates/ignores its style argument. These previews use sentence boundaries, punctuation, and context pauses only; tempo/emotion controls are not claimed."
+  },
+  "preview_directory": "outputs/voice-previews/minh-quan",
+  "quality_report": "outputs/voice-previews/minh-quan/quality-review.json",
+  "human_review_required": true,
+  "approval_phrase": "Tôi duyệt giọng Minh Quân làm voice mặc định Yuzhen Chơi Gì."
+}
