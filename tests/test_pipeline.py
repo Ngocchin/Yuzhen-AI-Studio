@@ -34,6 +34,24 @@ class StudioPipelineTests(unittest.TestCase):
             self.assertEqual(len(json.loads((output / "ideas.json").read_text())), 3)
             self.assertEqual(checkpoint["director"]["execution"], "sequential_checkpointed")
 
+    def test_generated_voice_is_accepted_for_render(self):
+        with tempfile.TemporaryDirectory() as temp, patch.object(studio, "ROOT", Path(temp)):
+            root = Path(temp)
+            (root / "config").mkdir()
+            (root / "config/defaults.json").write_text(json.dumps({"target_width": 1080, "target_height": 1920, "fps": 30, "meme_pause_seconds": 0.65}))
+            (root / "assets/user").mkdir(parents=True)
+            (root / "assets/user/gameplay.mp4").write_bytes(b"test fixture")
+            def synthesize_fixture(_text, output):
+                with wave.open(str(output), "wb") as wav:
+                    wav.setnchannels(1)
+                    wav.setsampwidth(2)
+                    wav.setframerate(22050)
+                    wav.writeframes(b"\0\0" * 2205)
+                return {"status": "generated", "validation": {"status": "validated"}}
+            with patch.object(studio, "inspect_voice", return_value={"ready": True}), patch.object(studio, "synthesize", side_effect=synthesize_fixture), patch.object(studio, "render_video", return_value={"status": "rendered", "artifact": "video.mp4"}) as render:
+                studio.run(Namespace(game="Liên Quân Mobile", mode="ENTERTAINMENT", voice=None))
+            self.assertTrue(render.called)
+
     def test_news_mode_stops_at_evidence_gate(self):
         with tempfile.TemporaryDirectory() as temp, patch.object(studio, "ROOT", Path(temp)):
             result = studio.run(Namespace(game="Liên Quân Mobile", mode="NEWS", voice=None))
