@@ -1,13 +1,39 @@
 {
   "id": "yuzhen-mobile-storytelling",
-  "version": 1,
+  "version": 2,
   "purpose": "Persistent editorial style for original mobile-game storytelling on TikTok and YouTube Shorts.",
   "reference_analysis": {
-    "status": "AWAITING_USER_MP4",
+    "status": "ANALYZED_FROM_USER_SUPPLIED_MP4",
     "reference_url": "https://youtube.com/shorts/vIy761qHkWQ",
-    "observed_facts": [],
-    "timestamped_timeline": [],
-    "note": "The reference could not be fetched in the current environment. The design rules below are Yuzhen-authored defaults, not observations of the reference. Update this section only after direct video inspection."
+    "local_reference_filename": "Tuyệt đối điện ảnh #battlefield3 #shorts #battlefield2042.mp4",
+    "inspection_method": "Direct inspection of user-supplied MP4 metadata and sampled frames/contact sheets. The linked YouTube page itself remains fetch-throttled.",
+    "technical_metadata": {"duration_seconds": 106.752, "width": 720, "height": 1280, "fps": 30, "video_codec": "h264", "audio_codec": "aac", "audio_sample_rate": 44100, "audio_channels": 2},
+    "observed_facts": [
+      "Portrait gaming story edit mixes Battlefield gameplay/cinematic shots with a visible creator facecam and brief reaction-meme cutaways.",
+      "It moves between first-person jet/air combat, parachute/ejection action, game UI/results and a brief real-world crowd/screen view, then returns to the creator reaction.",
+      "The reference uses close punch-ins and enlarged reaction crops; some portrait fills appear softened/blurred behind the focal image.",
+      "Vietnamese subtitles sit around the lower third with bold white text, dark outline/shadow and selective yellow word emphasis.",
+      "The edit mixes authentic game capture/cinematic material with creator reactions rather than relying on static cards or abstract vector scenes.",
+      "Visual cuts are frequent and tied to changes in action, reaction, or evidence; approximate sampled chapter ranges are recorded below."
+    ],
+    "timestamped_timeline": [
+      {"start": "00:00", "end": "00:18", "observation": "Immediate creator/facecam reaction, followed by falling/parachute and explosion gameplay, then repeated close reaction and meme cutaways to establish the emotional premise."},
+      {"start": "00:18", "end": "00:20", "observation": "Brief teal DICE title card acts as a chapter/identity beat."},
+      {"start": "00:20", "end": "00:54", "observation": "First-person jet sequence: cockpit, aircraft pursuit, aiming reticle and kill/result UI. Shots stay tied to the narrated gameplay event."},
+      {"start": "00:54", "end": "01:12", "observation": "Escalated first-person combat/explosion footage, result/UI inserts and a brief real-world screen/crowd shot provide payoff and scale."},
+      {"start": "01:12", "end": "01:30", "observation": "The visual palette shifts to newer Battlefield soldier/cinematic footage, juxtaposing eras before returning to aircraft action."},
+      {"start": "01:30", "end": "01:46", "observation": "The edit returns to the parachute/aircraft sequence and creator facecam; the creator's strong reaction/face-covering shot acts as the closing comic beat."}
+    ],
+    "audio_review": "Audio stream metadata was inspected, but speech/music were not reliably transcribed or listened to in this analysis. Do not infer exact speech cadence, voice identity, or music/SFX mix from the sampled frames.",
+    "reuse_boundary": "The file is a visual style reference only. This analysis does not grant permission to reuse its footage, facecam, audio, captions, exact edit, or creator identity.",
+    "note": "Reference-specific claims above come from the supplied MP4's sampled frames. Timestamp ranges are approximate visual chapters, not a frame-by-frame edit decision list. The design translation below is Yuzhen-authored adaptation, not a copy of the reference."
+  },
+  "observed_style_dna": {
+    "story_delivery": "A first-person gaming story supported by footage of the event and the creator's reactions.",
+    "visual_layers": ["gameplay_or_cinematic_as_primary_evidence", "brief_creator_facecam", "selective_reaction_meme", "game_UI_only_when_relevant"],
+    "editing": ["frequent action-motivated cuts", "brief punch-in reaction crops", "occasional softened portrait background fill", "switch visual scale for reveal/payoff"],
+    "subtitles": {"placement": "lower third", "appearance": "bold white with dark outline/shadow", "emphasis": "selective yellow word highlight"},
+    "caveats": ["Exact vocal delivery and audio balance are not yet verified by listening.", "The specific Battlefield footage, DICE card, facecam, memes, captions, and audio are not reusable permissions."]
   },
   "content": {
     "default_for": "mobile_game_storytelling",
@@ -23,12 +49,12 @@
     "duration_seconds": {"min": 40, "max": 60, "extended_min": 65, "extended_max": 90}
   },
   "proposed_editing_defaults": {
-    "status": "YUZHEN_DESIGN_PROPOSAL_PENDING_REFERENCE_REVIEW",
+    "status": "YUZHEN_ADAPTATION_OF_OBSERVED_METHODS",
     "format": {"width": 1080, "height": 1920, "fps": 30, "aspect_ratio": "9:16"},
     "opening_hook_seconds": {"min": 0, "max": 3},
-    "cut_rhythm": "Change shot when the narration changes story beat or introduces evidence; avoid arbitrary rapid cuts.",
-    "image_treatment": ["vertical crop preserving gameplay focal action", "restrained punch-in on relevant evidence", "subtitles synchronized to speech", "selective callouts only when they explain story context"],
-    "sound": "Voice leads; use only cleared music and selective SFX. Leave a context-appropriate pause for a major reaction beat.",
+    "cut_rhythm": "Adapt the reference's frequent, action-motivated cuts; keep every inserted shot relevant to the narrated claim and allow enough screen time to read the evidence.",
+    "image_treatment": ["use rights-cleared mobile-game footage as story evidence", "vertical crop preserving the gameplay focal action", "brief facecam or reaction inserts only when available and authorized", "selective punch-in on relevant action", "portrait blur fill only when needed to preserve the original frame", "synchronized lower-third subtitles with white text, dark outline, and selective yellow emphasis", "callouts only when they explain context"],
+    "sound": "Keep Minh Quân as the sole narration voice. Voice leads; use only cleared music and selective SFX. Do not copy the reference soundtrack or voice.",
     "ending": "Resolve the story question, then invite a specific audience response without manufacturing a cliffhanger."
   },
   "voice": {
