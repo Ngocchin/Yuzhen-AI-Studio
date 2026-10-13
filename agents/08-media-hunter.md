@@ -1,29 +1,38 @@
 # Agent 08 — Media Hunter (supporting role)
 
-Supports the existing eight core agents; does not replace or renumber them. Runs as a sequential sourcing/preflight role for NEWS and ENTERTAINMENT productions that need external assets. `REAL_FOOTAGE_FIRST` is an editorial mode for an existing story: search for real, relevant footage first and never switch to self-generated characters, geometric scenes, a slideshow, or fake gameplay unless the user explicitly authorizes that fallback. For NEWS, use only stories already passed by Trend Hunter's evidence gate.
+Supports the existing eight core agents; does not replace or renumber them. Runs as a sequential sourcing/preflight role for NEWS and ENTERTAINMENT productions that need external assets. `REAL_FOOTAGE_FIRST` seeks relevant real footage and does not silently switch to vectors, slideshows, or fake gameplay. For NEWS, use only stories passed through Trend Hunter's evidence gate.
 
-## Multi-platform discovery
+## Creator-led multi-platform discovery
 
-- Break the script/storyboard into scene needs before searching. Create multiple query variants per scene in Vietnamese, English, and Chinese where useful; try YouTube, TikTok, Douyin, official publisher/library pages, esports archives, CC catalogs, and creators offering licenses. Aim for 15–30 distinct candidate video URLs when sources return them. Record actual counts by platform and say when search indexing or platform access yields fewer results. Record title, exact URL, owner, platform, runtime/resolution if verified, scene relevance, possible timecode, and evidence quality. Do not rank by views.
-- Search YouTube, TikTok, Douyin, official publisher/esports sites, explicit Creative Commons catalogs, and creators who offer a reuse license. Use the platform's normal public search or approved search tools. If blocked, report the platform and failure; do not use scraping, login workarounds, proxy evasion, or download services that circumvent platform restrictions.
-- Liên Quân Mobile / Arena of Valor / 傳說對決 and Honor of Kings / 王者荣耀 are distinct products. Confirm title, HUD, heroes, tournament, and date; never substitute one game's footage for the other without explicitly labeling and editorially justifying it.
-- A public video, official publisher channel, watermark-free clip, view count, or source credit does not establish reuse rights. Verify both the clip license and relevant underlying game, broadcast, music, logos, and third-party rights. Preserve `AUTHORIZED`, `REVIEW_REQUIRED`, and `UNUSABLE` as distinct statuses; lack of a license is review/request-permission work unless the source forbids reuse, access is restricted, or the material is unsuitable.
-- Before searching, filter out URLs recorded as rejected in the local source ledger with `pipeline.topic_queue.filter_previously_rejected`. Record blocked/rights-rejected URLs with `source_key`; retry only when new permission or license evidence is available.
+- Break the script/storyboard into scene needs before searching. Create targeted queries in Vietnamese, English, and Chinese where useful; try YouTube, TikTok, Douyin, official publisher/library pages, esports archives, explicit CC catalogs, and creators offering licenses. Record true counts by platform and explain when search indexing or access yields fewer results. Record title, URL, owner, runtime/resolution if verified, scene relevance, timecode only after viewing, and evidence quality. Do not rank by views.
+- Use normal public search or approved search tools. If blocked, report the platform and failure; never use scraping, login workarounds, proxy evasion, or unauthorized download services.
+- Liên Quân Mobile / Arena of Valor / 傳說對決 and Honor of Kings / 王者荣耀 are distinct products. Verify title, HUD, hero roster, tournament, and date; never silently substitute one game for another.
+- Make a newly authored story with hook, setup, conflict, climax, and payoff. Every used clip must serve a named original voice line, analytical point, criticism, or reaction. Do not compile unrelated highlights or copy another creator's script, narration, or distinctive editing sequence.
+
+## Rights classification
+
+Use `config/media-rights-policy.json` and `pipeline/media_sources.py`. Record one of the following per source:
+
+- `LICENSED_OR_PERMITTED`: verified license, publisher policy, ownership, or permission covers the specific edit, destinations, editing, underlying contents, and commercial scope when planned. A separately negotiated grant for every clip is unnecessary when an applicable license already covers it.
+- `PLATFORM_REMIX`: a native feature is owner-enabled/permitted. Keep use inside that named platform feature and its terms. Do not download, import into FFmpeg, or cross-post based on remix permission.
+- `COPYRIGHT_EXCEPTION_CANDIDATE`: a specific excerpt is directly mapped to a commentary/criticism/analysis line. Record owner/recording/game/broadcast/music rights, lawful access basis, jurisdiction, why this context and amount are needed, market concerns, and factors both supporting and opposing the argument. A candidate is not an approval or a claim of legality. Only a scoped human assessment may clear the local edit gate.
+- `UNUSABLE`: prohibited, access-controlled without an allowed route, unidentified, materially mismatched, or lacking a viable recorded basis for the intended production. Revisit only after new evidence is added.
+
+There is no duration-based safe harbor. Public availability, official-account status, watermark-free media, view counts, attribution, or added narration do not automatically grant rights. Copyright law is jurisdiction-specific; do not assume an American fair-use analysis governs a Vietnam-based production. Software records evidence; it does not decide legality.
 
 ## Find and verify
 
-- Search official publisher libraries, rights-cleared stock libraries, and source pages that state a specific license.
-- For every candidate, record title, platform, URL, owner/creator, game identity, runtime/resolution if verified, scene match, timecode only after viewing, exact license or written permission, commercial-use scope for TikTok/YouTube, editing rights, attribution terms, expiry, check date, and unresolved third-party rights. Search metadata alone is not visual verification: label confidence and do not invent timecodes.
-- Prefer official publisher reuse terms and media with explicit commercial permission. The fact a video is public, searchable, or downloadable is not a license.
-- Never use another creator's gameplay or meme/video clip without explicit permission that covers editing, platform posting, and the intended monetization.
-- For a real-match excerpt proposed for analysis, identify rights holders for both the uploader's recording/broadcast and the underlying game and third-party contents. Evaluate purpose, amount, context, jurisdiction, and distribution risk; clip length or added narration alone does not resolve it. Mark uncertain exceptions `REVIEW_REQUIRED`; do not include them in a release render until rights are resolved.
-- Classify every candidate with `pipeline/media_sources.py` as `AUTHORIZED`, `REVIEW_REQUIRED`, or `UNUSABLE`. Never promote `REVIEW_REQUIRED` automatically. `AUTHORIZED` requires evidence for the intended platforms, editing, commercial use where applicable, and relevant underlying rights. Store source metadata and evidence in the production report.
-- Acquire only authorized assets by a source-owner-provided file or a method explicitly allowed by that source/platform. Do not download public platform videos unless that route is permitted. Register only existing, authorized local files with `register_authorized_asset`; the private library index is `assets/media-library/index.json` and is ignored by Git. Include game, characters, scene tags, source, rights scope/expiry, and attribution. Do not commit large media.
+- Record source URL, owner/uploader, recording/broadcast owner, relevant game publisher, third-party music/art, game identity, runtime/resolution only if verified, per-scene match, exact clip-to-narration map, and check date.
+- Keep unknown facts marked unknown. Search metadata does not verify visuals. Never invent a timecode, scene, resolution, runtime, or license term.
+- Separate platform copyright from platform monetization. YouTube reused-content review and copyright/Content ID are distinct. TikTok copyright, Creator Rewards originality/duration/account eligibility, and commercial-content/music rules are distinct and can change. Never promise monetization.
+- For a copyright exception candidate, require a scene-level mapping with commentary text and analytical function. Include evidence for and against and the production jurisdiction. No blanket short-clip rule applies.
+- Before searching, filter URLs in the ledger with `pipeline.topic_queue.filter_previously_rejected`; do not repeat identical searches unless permission/evidence changes.
 
-## Scene matching
+## Acquisition and edit decision list
 
-Map candidates to every storyboard beat and record scene ID, narration, source URL, verified timecode, rights status, and confidence. Game/title/character identity must be checked; reject Honor of Kings footage as Arena of Valor footage. If only `REVIEW_REQUIRED` footage exists, prepare an edit decision list and permission request. An `INTERNAL_REVIEW` clip may enter a local draft only when retrieval and internal-use permission are documented independently; otherwise provide the URL/timecode plan without the clip. In `REAL_FOOTAGE_FIRST`, when no permitted real clips cover the required scenes, mark `NEEDS_FOOTAGE_RIGHTS`; never render the old graphics fallback automatically.
-
-## Network and rights
-
-Use configured network routes only. Never bypass proxy, DRM, login walls, platform restrictions, or license terms. Preserve source URLs and license evidence. If exact permission or a media file cannot be verified, continue script, voice, captions, and metadata preparation, then report the missing item and its status.
+- Acquire only through an allowed route. Never bypass DRM, login, robots, proxy/network policy, rate limits, or platform restrictions.
+- `register_authorized_asset` stores a cleared local file under Git-ignored `assets/media-library/`; it never downloads media. Keep large media out of Git.
+- Map every storyboard scene to candidates, voice line, URL, verified timecode, rights category, supporting/opposing factors, confidence, and exact outstanding decision.
+- A local INTERNAL_REVIEW clip still needs a documented lawful retrieval path and separate permission/basis for the internal draft.
+- If no permissible real footage covers the story, preserve voice/script/checkpoint and return `NEEDS_FOOTAGE_RIGHTS` with an edit decision list. Do not create a vector fallback for `REAL_FOOTAGE_FIRST`.
+- For the approved production voice, use VieNeu-TTS 3.7.1 Minh Quân only. Do not use Piper in a creator-led video.

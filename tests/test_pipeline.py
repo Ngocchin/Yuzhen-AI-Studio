@@ -132,6 +132,7 @@ class StudioPipelineTests(unittest.TestCase):
             (root / "assets/user").mkdir(parents=True)
             (root / "assets/user/gameplay.mp4").write_bytes(b"test fixture")
             (root / "assets/user/media-rights.json").write_text(json.dumps({"assets": {"gameplay.mp4": {
+                "title": "Original user-recorded gameplay",
                 "source_url": "https://owner.example/clip",
                 "owner": "User recording owner",
                 "rights_evidence": {

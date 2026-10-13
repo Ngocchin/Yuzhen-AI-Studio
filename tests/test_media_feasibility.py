@@ -49,8 +49,14 @@ class MediaFeasibilityTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "source-ledger.json"
             url = "https://creator.example/clip"
-            record_source_decision(url, "UNUSABLE", "Reuse terms absent", path)
+            record_source_decision(url, "REVIEW_REQUIRED", "Exception candidate awaiting assessment", path,
+                                   category="COPYRIGHT_EXCEPTION_CANDIDATE",
+                                   supporting_factors=["specific commentary"],
+                                   opposing_factors=["rights unresolved"])
             ledger = json.loads(path.read_text())
+            self.assertEqual(ledger["schema_version"], 2)
+            self.assertEqual(ledger["items"][0]["rights_category"], "COPYRIGHT_EXCEPTION_CANDIDATE")
+            self.assertEqual(ledger["items"][0]["opposing_factors"], ["rights unresolved"])
             self.assertEqual(filter_previously_rejected([{"url": url}], ledger), [])
             record_source_decision(url, "AUTHORIZED", "New written rights receipt", path)
             ledger = json.loads(path.read_text())

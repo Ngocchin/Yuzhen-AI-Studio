@@ -64,7 +64,12 @@ def run_real_footage(args):
     for candidate in candidates:
         decision = classify_source(candidate)
         if candidate.get("source_url"):
-            record_source_decision(candidate["source_url"], decision["status"], decision["reason"])
+            record_source_decision(
+                candidate["source_url"], decision["status"], decision["reason"],
+                category=decision["category"],
+                supporting_factors=decision.get("supporting_factors", []),
+                opposing_factors=decision.get("opposing_factors", []),
+            )
     checkpoint = {
         "production_id": result["production_id"], "mode": "REAL_FOOTAGE_FIRST", "output_mode": mode,
         "status": result["status"], "may_render": result["may_render"],

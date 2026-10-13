@@ -1,15 +1,15 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Yuzhen authorized media library index",
+  "title": "Yuzhen cleared media library index",
   "type": "object",
   "required": ["schema_version", "assets"],
   "properties": {
-    "schema_version": {"const": 1},
+    "schema_version": {"const": 2},
     "assets": {
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["asset_id", "path", "game", "source_url", "owner", "license", "checked_at", "scope", "permitted_platforms", "commercial_use", "editing_allowed", "underlying_rights_cleared", "status", "sha256"],
+        "required": ["asset_id", "path", "game", "source_url", "owner", "rights_category", "license", "checked_at", "scope", "permitted_platforms", "commercial_use", "editing_allowed", "underlying_rights_cleared", "status", "sha256"],
         "properties": {
           "asset_id": {"type": "string"},
           "game": {"type": "string"},
@@ -17,6 +17,7 @@
           "scene_tags": {"type": "array", "items": {"type": "string"}},
           "source_url": {"type": "string", "format": "uri"},
           "owner": {"type": "string"},
+          "rights_category": {"enum": ["LICENSED_OR_PERMITTED", "COPYRIGHT_EXCEPTION_CANDIDATE"]},
           "license": {"type": "string"},
           "license_url": {"type": ["string", "null"]},
           "checked_at": {"type": "string", "format": "date-time"},
@@ -27,7 +28,8 @@
           "editing_allowed": {"type": "boolean"},
           "underlying_rights_cleared": {"type": "boolean"},
           "attribution": {"type": "string"},
-          "status": {"const": "AUTHORIZED"},
+          "legal_assessment": {"type": ["object", "null"]},
+          "status": {"const": "CLEARED_FOR_RECORDED_SCOPE"},
           "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
         }
       }

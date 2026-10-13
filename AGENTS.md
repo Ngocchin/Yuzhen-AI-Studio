@@ -19,10 +19,10 @@ Before every topic decision, read `config/content-strategy.json` and use `pipeli
 ## Safety and rights
 
 - NEWS mode requires a publisher, source URL, and publication date that can be verified against the source; when network access is unavailable, record `NETWORK_BLOCKED` and stop news claims.
-- Do not bundle unlicensed gameplay, music, memes, or sound effects. Users must supply media they have rights to use.
+- Use only media with a verified license/permission scope or a scoped human assessment recorded for the applicable exception and this production. Exception candidates are not cleared automatically. Native remix features remain inside the named platform; do not download or cross-post them.
 - Never publish to a channel automatically.
 - Keep model files, API keys, and secrets out of Git.
-- Never fetch or extract gameplay from another creator's public TikTok, Shorts, or YouTube upload without an explicit reuse grant that covers this production. Attribution alone is not permission.
+- Never treat public access, attribution, short duration, official upload status, or added narration as permission. Follow the four rights categories in `config/media-rights-policy.json`, document supporting and opposing factors, and do not state a legal or monetization guarantee.
 
 ## Pipeline
 

@@ -24,15 +24,25 @@ def filter_previously_rejected(sources: list[dict], ledger: dict) -> list[dict]:
     return [item for item in sources if source_key(item.get("url") or item.get("source_url", "")) not in rejected]
 
 
-def record_source_decision(url: str, status: str, reason: str, path: Path = DEFAULT_SOURCE_LEDGER) -> dict:
+def record_source_decision(
+    url: str, status: str, reason: str, path: Path = DEFAULT_SOURCE_LEDGER,
+    *, category: str | None = None, supporting_factors: list[str] | None = None,
+    opposing_factors: list[str] | None = None,
+) -> dict:
     """Cache a rights decision to avoid repeating dead-end searches until evidence changes."""
     if status not in {"AUTHORIZED", "REVIEW_REQUIRED", "UNUSABLE"}:
         raise ValueError("status must be AUTHORIZED, REVIEW_REQUIRED, or UNUSABLE")
     path = Path(path)
-    ledger = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {"schema_version": 1, "items": [], "rejected_source_keys": []}
+    ledger = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {"schema_version": 2, "items": [], "rejected_source_keys": []}
+    ledger["schema_version"] = 2
     key = source_key(url)
     ledger["items"] = [item for item in ledger.get("items", []) if item.get("source_key") != key]
-    entry = {"source_key": key, "url": url, "status": status, "reason": reason}
+    entry = {
+        "source_key": key, "url": url, "status": status, "reason": reason,
+        "rights_category": category,
+        "supporting_factors": list(supporting_factors or []),
+        "opposing_factors": list(opposing_factors or []),
+    }
     ledger["items"].append(entry)
     if status != "AUTHORIZED":
         ledger["rejected_source_keys"] = sorted(set(ledger.get("rejected_source_keys", [])) | {key})

@@ -113,8 +113,20 @@ def preflight_real_footage(
             eligible = (rights["status"] == "AUTHORIZED" and in_library and media_probe["verified"]
                         and has_timecode
                         and candidate.get("game_identity_verified") is True)
+            exception = candidate.get("copyright_exception") or {}
+            if rights["category"] == "COPYRIGHT_EXCEPTION_CANDIDATE":
+                mappings = exception.get("commentary_map") or []
+                scene_mapping = any(
+                    isinstance(item, dict)
+                    and str(item.get("scene_id")) == scene_id
+                    and bool(item.get("commentary_text"))
+                    and bool(item.get("analysis_function"))
+                    for item in mappings
+                )
+                eligible = eligible and scene_mapping and rights["operationally_cleared"]
             internal_ok, internal_reason = _internal_review_permitted(candidate)
-            if mode == "INTERNAL_REVIEW" and rights["status"] == "REVIEW_REQUIRED" and internal_ok:
+            if (mode == "INTERNAL_REVIEW" and rights["category"] != "PLATFORM_REMIX"
+                    and rights["status"] == "REVIEW_REQUIRED" and internal_ok):
                 eligible = (in_library and media_probe["verified"] and has_timecode
                             and candidate.get("game_identity_verified") is True)
             row = {
@@ -130,7 +142,10 @@ def preflight_real_footage(
                 "timecode": ({"in_seconds": match["in_seconds"], "out_seconds": match["out_seconds"]}
                              if has_timecode else None),
                 "rights_status": rights["status"],
+                "rights_category": rights["category"],
                 "rights_reason": rights["reason"],
+                "rights_supporting_factors": rights.get("supporting_factors", []),
+                "rights_opposing_factors": rights.get("opposing_factors", []),
                 "internal_review_basis": internal_reason,
                 "game_identity_verified": candidate.get("game_identity_verified") is True,
                 "confidence": match.get("confidence", "LOW"),

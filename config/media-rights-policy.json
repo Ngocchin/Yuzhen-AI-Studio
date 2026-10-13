@@ -1,0 +1,52 @@
+{
+  "schema_version": 2,
+  "policy_name": "Yuzhen Creator-Led Gaming Storytelling",
+  "target_platforms": ["youtube", "tiktok"],
+  "future_commercial_use": true,
+  "rights_categories": {
+    "LICENSED_OR_PERMITTED": {
+      "description": "A license, publisher policy, ownership record, or permission expressly covers the intended edit and destination platform(s).",
+      "required_evidence": ["identified_owner", "source_url", "license_or_permission_record", "scope", "editing_rights", "underlying_rights_review", "platform_scope", "commercial_scope_when_planned", "attribution_when_required"],
+      "allow_local_edit": true
+    },
+    "PLATFORM_REMIX": {
+      "description": "Use is available only through an owner-enabled native feature under the platform's current terms and the original platform/account settings.",
+      "required_evidence": ["source_url", "platform", "feature", "owner_enabled_or_platform_permission", "native_feature_only", "verification_record"],
+      "allow_download": false,
+      "allow_cross_platform": false,
+      "allow_local_ffmpeg_import": false
+    },
+    "COPYRIGHT_EXCEPTION_CANDIDATE": {
+      "description": "A specific excerpt is proposed for criticism, analysis, commentary, or another potentially applicable exception. Candidate status is not a legal conclusion or monetization clearance.",
+      "required_evidence": ["jurisdiction", "identified_rights_holders", "editorial_purpose", "scene_specific_commentary_map", "source_acquisition_basis", "amount_rationale", "market_effect_analysis", "supporting_factors", "opposing_factors"],
+      "required_for_local_edit": ["scoped_human_legal_assessment", "assessment_record", "reviewer", "rights_holders_reviewed", "target_platforms", "commercial_scope_when_planned", "source_access_legitimate", "scene_specific_commentary_map"],
+      "clip_duration_safe_harbor_seconds": null,
+      "legal_conclusion_by_software": false
+    },
+    "UNUSABLE": {
+      "description": "Prohibited, access-controlled without an allowed route, unidentified, materially mismatched, or lacking any recorded production basis.",
+      "allow_download": false,
+      "allow_edit": false
+    }
+  },
+  "rights_checks": [
+    "A public URL, official account, creator credit, watermark status, added narration, or short duration does not automatically grant rights.",
+    "Assess the gameplay recording, broadcast, game/publisher content, music, overlays, and third-party contributions separately where relevant.",
+    "Never bypass DRM, login controls, robots rules, proxy policy, rate limits, or platform restrictions.",
+    "Do not reuse one platform's native remix permission for downloading, offline editing, or cross-posting.",
+    "Copyright exceptions are jurisdiction-specific. Record evidence both for and against, and do not mark monetization eligibility as guaranteed."
+  ],
+  "creator_led_requirements": {
+    "minimum_original_structure": ["hook", "setup", "conflict", "climax", "payoff"],
+    "each_clip_must_map_to_commentary": true,
+    "voice_profile": {"engine": "VieNeu-TTS", "version": "3.7.1", "preset": "Minh Quân", "required": true},
+    "clip_compilation_without_substantive_commentary": false,
+    "graphics_fallback_for_real_footage_first": false,
+    "unresolved_rights_render_status": "NEEDS_FOOTAGE_RIGHTS"
+  },
+  "monetization_review": {
+    "youtube": ["reused_content_policy", "copyright_and_content_id", "original_commentary_and_transformation", "gameplay_and_broadcast_license_scope"],
+    "tiktok": ["copyright_and_source", "original_content_rules", "creator_rewards_program_duration_and_account_eligibility", "commercial_music_and_branded_content_disclosure"],
+    "must_not_claim_guaranteed_monetization": true
+  }
+}
