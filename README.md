@@ -40,6 +40,10 @@ Agent 00 coordinates agents 01–07 through checkpointed phases. Entertainment m
 
 ## Event storytelling style
 
+### Mobile-game storytelling default
+
+`config/styles/yuzhen-mobile-storytelling.json` is the persistent default for mobile-game stories. It requires an original story-led script, the approved Minh Quân voice, scene-specific relevance for footage, and a rights check. It does not authorize a graphics fallback when real footage is requested. The supplied YouTube Shorts reference could not be fetched in this environment, so its analysis and timestamped timeline remain pending an MP4 from the user. The editing defaults in the profile are labeled as Yuzhen proposals, not observations of that reference. Existing `yuzhen-event-storytelling` outputs and productions remain unchanged.
+
 The reusable `yuzhen-event-storytelling` profile is in `config/styles/`. It defines a blue 1080x1920, 30 FPS design, safe areas, Vietnamese subtitle styling, restrained zoom/pan and transition settings, and the approved Minh Quân voice. `pipeline/event_storytelling.py` renders original information cards with FFmpeg motion and crossfades. Source images can be used only after the Media Hunter records their rights in `reports/media-sources.md`; no gameplay or other creator's branding is generated as a substitute.
 
 Render a timed storyboard with the style profile using:

@@ -1,11 +1,35 @@
 {
   "channel_positioning": "Gaming storytelling: characters, in-game stories, history, rivalries, mysteries and clearly labeled fiction.",
   "story_first": true,
-  "categories": ["CHARACTER", "GAME", "LORE", "MYSTERY", "ESPORTS", "EVENT_HISTORY"],
-  "category_preference_order": ["CHARACTER", "GAME", "LORE", "MYSTERY", "ESPORTS", "EVENT_HISTORY"],
+  "categories": [
+    "CHARACTER",
+    "GAME",
+    "LORE",
+    "MYSTERY",
+    "ESPORTS",
+    "EVENT_HISTORY"
+  ],
+  "category_preference_order": [
+    "CHARACTER",
+    "GAME",
+    "LORE",
+    "MYSTERY",
+    "ESPORTS",
+    "EVENT_HISTORY"
+  ],
   "hard_filter": {
     "reject_admin_only": true,
-    "reject_terms": ["xe bus", "xe đưa đón", "đăng ký nhận vé", "lịch nhận vé", "hướng dẫn nhận quà", "bảo trì", "khuyến mãi", "nhập code", "lịch sự kiện"],
+    "reject_terms": [
+      "xe bus",
+      "xe đưa đón",
+      "đăng ký nhận vé",
+      "lịch nhận vé",
+      "hướng dẫn nhận quà",
+      "bảo trì",
+      "khuyến mãi",
+      "nhập code",
+      "lịch sự kiện"
+    ],
     "allow_event_only_when_story_angle": true,
     "fact_claim_requires_source": true,
     "unverified_claim_policy": "BLOCK_AS_FACT; may be labeled FAN_THEORY or FICTION only when appropriate"
@@ -38,8 +62,19 @@
     "hot_score_role": "verified_tiebreaker_only",
     "viral_score_is_prediction": false
   },
-  "research": {"ideas_target": 10, "shortlist_size": 3, "finalist_report_size": 5},
-  "story_structure": ["HOOK", "SETUP", "CONFLICT", "CLIMAX", "PAYOFF", "ENDING"],
+  "research": {
+    "ideas_target": 10,
+    "shortlist_size": 3,
+    "finalist_report_size": 5
+  },
+  "story_structure": [
+    "HOOK",
+    "SETUP",
+    "CONFLICT",
+    "CLIMAX",
+    "PAYOFF",
+    "ENDING"
+  ],
   "voice": {
     "engine": "VieNeu-TTS",
     "version": "3.7.1",
@@ -47,13 +82,19 @@
     "required": true,
     "block_if_unavailable": true,
     "allow_automatic_production_fallback": false,
-    "meme_pause_seconds": {"min": 0.5, "max": 0.8}
+    "meme_pause_seconds": {
+      "min": 0.5,
+      "max": 0.8
+    }
   },
   "production": {
-    "video_style": "yuzhen-event-storytelling",
+    "video_style": "yuzhen-mobile-storytelling",
     "resolution": "1080x1920",
     "fps": 30,
-    "duration_seconds": {"min": 35, "max": 60},
+    "duration_seconds": {
+      "min": 35,
+      "max": 60
+    },
     "never_present_motion_graphics_as_gameplay": true,
     "verify_media_reuse_rights": true
   }

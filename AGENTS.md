@@ -4,6 +4,8 @@
 
 ## Permanent channel strategy
 
+For mobile game requests, apply `config/styles/yuzhen-mobile-storytelling.json` by default. It is the channel's persistent editorial style profile. Its reference-analysis section is explicitly pending direct inspection of the user-provided Shorts; do not claim its proposed edit rules were observed in that video. If the reference URL cannot be viewed, request an MP4 and continue only with clearly marked Yuzhen-authored defaults until it is supplied. Do not replace footage-first production with vector artwork when footage is unavailable.
+
 Before every topic decision, read `config/content-strategy.json` and use `pipeline/story_strategy.py`. Yuzhen Chơi Gì is a gaming-storytelling channel, not a game-news bulletin. Apply the admin-only hard filter before scoring; require sources for factual/canon claims; distinguish CANON, REAL_EVENT, REAL_MATCH, FAN_THEORY, and FICTION. Score Storytelling (minimum 75), Viral Potential, and Media Feasibility separately. Production priority weights are 50% Storytelling, 20% Viral Potential, and 30% Media Feasibility. Media Feasibility is neither a trend signal nor a rights decision. Use the local topic/source ledger to waitlist compelling blocked topics and avoid rejected URLs until permission changes. Verified Hot Score is a tie breaker within topic research only. Use the approved VieNeu-TTS 3.7.1 Minh Quân voice; block if unavailable. Do not represent original graphics as gameplay. Verify media reuse rights and preserve existing outputs/checkpoints; never publish.
 
 ## Director sequence
