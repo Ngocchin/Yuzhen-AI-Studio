@@ -1,0 +1,659 @@
+{
+  "schema_version": 2,
+  "assets": [],
+  "candidate_reviews": [
+    {
+      "asset_id": "yt-volkath-rebirth-yikez",
+      "platform": "YouTube",
+      "source_url": "https://www.youtube.com/watch?v=qUVdOrv-Sg4",
+      "title": "rebirth of VOLKATH | VOLKATH cinematic | AOV 3.0 …",
+      "uploader": "YikeZ",
+      "suspected_rights_holders": [
+        "Uploader/source-video owner",
+        "Garena/Tencent or relevant game publisher"
+      ],
+      "game_publisher": "Garena/Tencent (game rights may be separate from video rights)",
+      "footage_type": "unknown",
+      "duration_seconds": null,
+      "selected_timecode": null,
+      "narration_purpose": "Potential title-level match only; not frame-verified.",
+      "rights_status": "EXCEPTION_REVIEW",
+      "acquisition_status": "NOT_ACQUIRED",
+      "license_or_authorization_evidence": "Only existing search metadata is available; the video page/content and rights could not be verified in this review.",
+      "review_date": "2026-10-13",
+      "reviewer": "Yuzhen AI Studio internal evidence review",
+      "final_status": "WAITING_FOR_RIGHTS_REVIEW",
+      "timecode_status": "UNVERIFIED",
+      "game_identity_verified": false,
+      "can_import_now": false,
+      "copyright_exception_assessment": {
+        "jurisdiction": "Vietnam (provisional; production account/territory and applicable law not independently confirmed)",
+        "jurisdiction_confirmed": false,
+        "purpose": "Commentary/analysis contrasting the independently sourced 2019 Athanor lore account with the dated in-game Arrow of Chaos mechanic; not a general compilation.",
+        "supporting_factors": [
+          "The draft has an original Vietnamese narration and a specific lore-versus-historical-mechanic question.",
+          "A candidate could serve as evidence for a line of commentary if the exact segment directly relates to that point."
+        ],
+        "opposing_factors": [
+          "The current script analyzes the lore/mechanic, not the source creator’s particular editing or creative choices; direct criticism of the source video is weak or absent.",
+          "No clip content, exact timecode, amount, or scene relevance has been frame-verified.",
+          "Uploader, broadcast, underlying game, music, and third-party rights are unresolved.",
+          "Commercial intent increases the need to assess licensing markets; no exception determination or permission is recorded.",
+          "Search-page visibility does not establish an allowed download or local-edit method."
+        ],
+        "human_assessment_recorded": false,
+        "lawful_acquisition_basis_recorded": false
+      }
+    },
+    {
+      "asset_id": "yt-volkath-teaser-augustian",
+      "platform": "YouTube",
+      "source_url": "https://www.youtube.com/watch?v=dFKZe2KvCI4",
+      "title": "VOLKATH CINEMATIC TEASER | ARENA OF VALOR",
+      "uploader": "Augustian Ray",
+      "suspected_rights_holders": [
+        "Uploader/source-video owner",
+        "Garena/Tencent or relevant game publisher"
+      ],
+      "game_publisher": "Garena/Tencent (game rights may be separate from video rights)",
+      "footage_type": "unknown",
+      "duration_seconds": null,
+      "selected_timecode": null,
+      "narration_purpose": "Potential title-level match only; not frame-verified.",
+      "rights_status": "EXCEPTION_REVIEW",
+      "acquisition_status": "NOT_ACQUIRED",
+      "license_or_authorization_evidence": "Only existing search metadata is available; the video page/content and rights could not be verified in this review.",
+      "review_date": "2026-10-13",
+      "reviewer": "Yuzhen AI Studio internal evidence review",
+      "final_status": "WAITING_FOR_RIGHTS_REVIEW",
+      "timecode_status": "UNVERIFIED",
+      "game_identity_verified": false,
+      "can_import_now": false,
+      "copyright_exception_assessment": {
+        "jurisdiction": "Vietnam (provisional; production account/territory and applicable law not independently confirmed)",
+        "jurisdiction_confirmed": false,
+        "purpose": "Commentary/analysis contrasting the independently sourced 2019 Athanor lore account with the dated in-game Arrow of Chaos mechanic; not a general compilation.",
+        "supporting_factors": [
+          "The draft has an original Vietnamese narration and a specific lore-versus-historical-mechanic question.",
+          "A candidate could serve as evidence for a line of commentary if the exact segment directly relates to that point."
+        ],
+        "opposing_factors": [
+          "The current script analyzes the lore/mechanic, not the source creator’s particular editing or creative choices; direct criticism of the source video is weak or absent.",
+          "No clip content, exact timecode, amount, or scene relevance has been frame-verified.",
+          "Uploader, broadcast, underlying game, music, and third-party rights are unresolved.",
+          "Commercial intent increases the need to assess licensing markets; no exception determination or permission is recorded.",
+          "Search-page visibility does not establish an allowed download or local-edit method."
+        ],
+        "human_assessment_recorded": false,
+        "lawful_acquisition_basis_recorded": false
+      }
+    },
+    {
+      "asset_id": "yt-garena-volkath-skin-trailer",
+      "platform": "YouTube",
+      "source_url": "https://www.youtube.com/watch?v=4rooUsCZw40",
+      "title": "IN-GAME TRAILER | VOLKATH, THE GHOST OF THE DIVINE SWORD",
+      "uploader": "Garena Arena of Valor",
+      "suspected_rights_holders": [
+        "Uploader/source-video owner",
+        "Garena/Tencent or relevant game publisher"
+      ],
+      "game_publisher": "Garena/Tencent (game rights may be separate from video rights)",
+      "footage_type": "unknown",
+      "duration_seconds": null,
+      "selected_timecode": null,
+      "narration_purpose": "Editorial mismatch per existing candidate record.",
+      "rights_status": "UNUSABLE",
+      "acquisition_status": "NOT_ACQUIRED",
+      "license_or_authorization_evidence": "Existing source record says title/description is a mismatch or reupload is prohibited; no new evidence. Existing assessment classifies this URL unusable or editorially mismatched; no evidence to reverse the classification.",
+      "review_date": "2026-10-13",
+      "reviewer": "Yuzhen AI Studio internal evidence review",
+      "final_status": "UNUSABLE",
+      "timecode_status": "UNVERIFIED",
+      "game_identity_verified": false,
+      "can_import_now": false,
+      "copyright_exception_assessment": {
+        "jurisdiction": null,
+        "jurisdiction_confirmed": false,
+        "purpose": null,
+        "supporting_factors": [],
+        "opposing_factors": [
+          "Use is prohibited or would require bypassing access controls/DRM."
+        ],
+        "human_assessment_recorded": false,
+        "lawful_acquisition_basis_recorded": false
+      }
+    },
+    {
+      "asset_id": "yt-garena-volkath-selection",
+      "platform": "YouTube",
+      "source_url": "https://www.youtube.com/watch?v=qpphHXBs68I",
+      "title": "HERO SELECTION SCREEN | VOLKATH, THE ILLUSIONARY SWORD",
+      "uploader": "Garena Liên Quân",
+      "suspected_rights_holders": [
+        "Uploader/source-video owner",
+        "Garena/Tencent or relevant game publisher"
+      ],
+      "game_publisher": "Garena/Tencent (game rights may be separate from video rights)",
+      "footage_type": "unknown",
+      "duration_seconds": null,
+      "selected_timecode": null,
+      "narration_purpose": "Editorial mismatch per existing candidate record.",
+      "rights_status": "UNUSABLE",
+      "acquisition_status": "NOT_ACQUIRED",
+      "license_or_authorization_evidence": "Existing source record says title/description is a mismatch or reupload is prohibited; no new evidence. Existing assessment classifies this URL unusable or editorially mismatched; no evidence to reverse the classification.",
+      "review_date": "2026-10-13",
+      "reviewer": "Yuzhen AI Studio internal evidence review",
+      "final_status": "UNUSABLE",
+      "timecode_status": "UNVERIFIED",
+      "game_identity_verified": false,
+      "can_import_now": false,
+      "copyright_exception_assessment": {
+        "jurisdiction": null,
+        "jurisdiction_confirmed": false,
+        "purpose": null,
+        "supporting_factors": [],
+        "opposing_factors": [
+          "Use is prohibited or would require bypassing access controls/DRM."
+        ],
+        "human_assessment_recorded": false,
+        "lawful_acquisition_basis_recorded": false
+      }
+    },
+    {
+      "asset_id": "yt-garena-telannas-tulen",
+      "platform": "YouTube",
+      "source_url": "https://www.youtube.com/watch?v=U0AuAfLRazw",
+      "title": "Ingame Trailer | Tel'Annas và Tulen Tân Niên Vệ Thần",
+      "uploader": "Garena Liên Quân",
+      "suspected_rights_holders": [
+        "Uploader/source-video owner",
+        "Garena/Tencent or relevant game publisher"
+      ],
+      "game_publisher": "Garena/Tencent (game rights may be separate from video rights)",
+      "footage_type": "unknown",
+      "duration_seconds": null,
+      "selected_timecode": null,
+      "narration_purpose": "Potential title-level match only; not frame-verified.",
+      "rights_status": "UNUSABLE",
+      "acquisition_status": "NOT_ACQUIRED",
+      "license_or_authorization_evidence": "Only existing search metadata is available; the video page/content and rights could not be verified in this review. Existing assessment classifies this URL unusable or editorially mismatched; no evidence to reverse the classification.",
+      "review_date": "2026-10-13",
+      "reviewer": "Yuzhen AI Studio internal evidence review",
+      "final_status": "UNUSABLE",
+      "timecode_status": "UNVERIFIED",
+      "game_identity_verified": false,
+      "can_import_now": false,
+      "copyright_exception_assessment": {
+        "jurisdiction": null,
+        "jurisdiction_confirmed": false,
+        "purpose": null,
+        "supporting_factors": [],
+        "opposing_factors": [
+          "Asset is editorially unsuitable for this story."
+        ],
+        "human_assessment_recorded": false,
+        "lawful_acquisition_basis_recorded": false
+      }
+    },
+    {
+      "asset_id": "yt-garena-telannas-fox",
+      "platform": "YouTube",
+      "source_url": "https://www.youtube.com/watch?v=15hJf4aLmGs",
+      "title": "Tel'Annas Fox Shrine Maiden Cinematic Video",
+      "uploader": "Garena AOV Indonesia",
+      "suspected_rights_holders": [
+        "Uploader/source-video owner",
+        "Garena/Tencent or relevant game publisher"
+      ],
+      "game_publisher": "Garena/Tencent (game rights may be separate from video rights)",
+      "footage_type": "unknown",
+      "duration_seconds": null,
+      "selected_timecode": null,
+      "narration_purpose": "Editorial mismatch per existing candidate record.",
+      "rights_status": "UNUSABLE",
+      "acquisition_status": "NOT_ACQUIRED",
+      "license_or_authorization_evidence": "Existing source record says title/description is a mismatch or reupload is prohibited; no new evidence. Existing assessment classifies this URL unusable or editorially mismatched; no evidence to reverse the classification.",
+      "review_date": "2026-10-13",
+      "reviewer": "Yuzhen AI Studio internal evidence review",
+      "final_status": "UNUSABLE",
+      "timecode_status": "UNVERIFIED",
+      "game_identity_verified": false,
+      "can_import_now": false,
+      "copyright_exception_assessment": {
+        "jurisdiction": null,
+        "jurisdiction_confirmed": false,
+        "purpose": null,
+        "supporting_factors": [],
+        "opposing_factors": [
+          "Asset is editorially unsuitable for this story."
+        ],
+        "human_assessment_recorded": false,
+        "lawful_acquisition_basis_recorded": false
+      }
+    },
+    {
+      "asset_id": "yt-telannas-gameplay",
+      "platform": "YouTube",
+      "source_url": "https://www.youtube.com/watch?v=PwTDpP3d2_U",
+      "title": "TEL'ANNAS GAMEPLAY | MARKSMAN TIER A - ARENA OF VALOR",
+      "uploader": "Creator not verified",
+      "suspected_rights_holders": [
+        "Uploader/source-video owner",
+        "Garena/Tencent or relevant game publisher"
+      ],
+      "game_publisher": "Garena/Tencent (game rights may be separate from video rights)",
+      "footage_type": "unknown",
+      "duration_seconds": null,
+      "selected_timecode": null,
+      "narration_purpose": "Potential title-level match only; not frame-verified.",
+      "rights_status": "EXCEPTION_REVIEW",
+      "acquisition_status": "NOT_ACQUIRED",
+      "license_or_authorization_evidence": "Only existing search metadata is available; the video page/content and rights could not be verified in this review.",
+      "review_date": "2026-10-13",
+      "reviewer": "Yuzhen AI Studio internal evidence review",
+      "final_status": "WAITING_FOR_RIGHTS_REVIEW",
+      "timecode_status": "UNVERIFIED",
+      "game_identity_verified": false,
+      "can_import_now": false,
+      "copyright_exception_assessment": {
+        "jurisdiction": "Vietnam (provisional; production account/territory and applicable law not independently confirmed)",
+        "jurisdiction_confirmed": false,
+        "purpose": "Commentary/analysis contrasting the independently sourced 2019 Athanor lore account with the dated in-game Arrow of Chaos mechanic; not a general compilation.",
+        "supporting_factors": [
+          "The draft has an original Vietnamese narration and a specific lore-versus-historical-mechanic question.",
+          "A candidate could serve as evidence for a line of commentary if the exact segment directly relates to that point."
+        ],
+        "opposing_factors": [
+          "The current script analyzes the lore/mechanic, not the source creator’s particular editing or creative choices; direct criticism of the source video is weak or absent.",
+          "No clip content, exact timecode, amount, or scene relevance has been frame-verified.",
+          "Uploader, broadcast, underlying game, music, and third-party rights are unresolved.",
+          "Commercial intent increases the need to assess licensing markets; no exception determination or permission is recorded.",
+          "Search-page visibility does not establish an allowed download or local-edit method."
+        ],
+        "human_assessment_recorded": false,
+        "lawful_acquisition_basis_recorded": false
+      }
+    },
+    {
+      "asset_id": "yt-garena-volkath-2019",
+      "platform": "YouTube",
+      "source_url": "https://www.youtube.com/watch?v=rE3OmMNs9WM",
+      "title": "TRAILER | Chúa Tể Hắc Ám Volkath - Lên ngựa quất nguyên team",
+      "uploader": "Garena Liên Quân",
+      "suspected_rights_holders": [
+        "Uploader/source-video owner",
+        "Garena/Tencent or relevant game publisher"
+      ],
+      "game_publisher": "Garena/Tencent (game rights may be separate from video rights)",
+      "footage_type": "unknown",
+      "duration_seconds": null,
+      "selected_timecode": null,
+      "narration_purpose": "Potential title-level match only; not frame-verified.",
+      "rights_status": "EXCEPTION_REVIEW",
+      "acquisition_status": "NOT_ACQUIRED",
+      "license_or_authorization_evidence": "Only existing search metadata is available; the video page/content and rights could not be verified in this review.",
+      "review_date": "2026-10-13",
+      "reviewer": "Yuzhen AI Studio internal evidence review",
+      "final_status": "WAITING_FOR_RIGHTS_REVIEW",
+      "timecode_status": "UNVERIFIED",
+      "game_identity_verified": false,
+      "can_import_now": false,
+      "copyright_exception_assessment": {
+        "jurisdiction": "Vietnam (provisional; production account/territory and applicable law not independently confirmed)",
+        "jurisdiction_confirmed": false,
+        "purpose": "Commentary/analysis contrasting the independently sourced 2019 Athanor lore account with the dated in-game Arrow of Chaos mechanic; not a general compilation.",
+        "supporting_factors": [
+          "The draft has an original Vietnamese narration and a specific lore-versus-historical-mechanic question.",
+          "A candidate could serve as evidence for a line of commentary if the exact segment directly relates to that point."
+        ],
+        "opposing_factors": [
+          "The current script analyzes the lore/mechanic, not the source creator’s particular editing or creative choices; direct criticism of the source video is weak or absent.",
+          "No clip content, exact timecode, amount, or scene relevance has been frame-verified.",
+          "Uploader, broadcast, underlying game, music, and third-party rights are unresolved.",
+          "Commercial intent increases the need to assess licensing markets; no exception determination or permission is recorded.",
+          "Search-page visibility does not establish an allowed download or local-edit method."
+        ],
+        "human_assessment_recorded": false,
+        "lawful_acquisition_basis_recorded": false
+      }
+    },
+    {
+      "asset_id": "yt-garena-volkath-spotlight",
+      "platform": "YouTube",
+      "source_url": "https://www.youtube.com/watch?v=xlJRYblHUUk",
+      "title": "The Lord of Darkness - Volkath Hero Spotlight",
+      "uploader": "Garena AOV Indonesia",
+      "suspected_rights_holders": [
+        "Uploader/source-video owner",
+        "Garena/Tencent or relevant game publisher"
+      ],
+      "game_publisher": "Garena/Tencent (game rights may be separate from video rights)",
+      "footage_type": "unknown",
+      "duration_seconds": null,
+      "selected_timecode": null,
+      "narration_purpose": "Potential title-level match only; not frame-verified.",
+      "rights_status": "EXCEPTION_REVIEW",
+      "acquisition_status": "NOT_ACQUIRED",
+      "license_or_authorization_evidence": "Only existing search metadata is available; the video page/content and rights could not be verified in this review.",
+      "review_date": "2026-10-13",
+      "reviewer": "Yuzhen AI Studio internal evidence review",
+      "final_status": "WAITING_FOR_RIGHTS_REVIEW",
+      "timecode_status": "UNVERIFIED",
+      "game_identity_verified": false,
+      "can_import_now": false,
+      "copyright_exception_assessment": {
+        "jurisdiction": "Vietnam (provisional; production account/territory and applicable law not independently confirmed)",
+        "jurisdiction_confirmed": false,
+        "purpose": "Commentary/analysis contrasting the independently sourced 2019 Athanor lore account with the dated in-game Arrow of Chaos mechanic; not a general compilation.",
+        "supporting_factors": [
+          "The draft has an original Vietnamese narration and a specific lore-versus-historical-mechanic question.",
+          "A candidate could serve as evidence for a line of commentary if the exact segment directly relates to that point."
+        ],
+        "opposing_factors": [
+          "The current script analyzes the lore/mechanic, not the source creator’s particular editing or creative choices; direct criticism of the source video is weak or absent.",
+          "No clip content, exact timecode, amount, or scene relevance has been frame-verified.",
+          "Uploader, broadcast, underlying game, music, and third-party rights are unresolved.",
+          "Commercial intent increases the need to assess licensing markets; no exception determination or permission is recorded.",
+          "Search-page visibility does not establish an allowed download or local-edit method."
+        ],
+        "human_assessment_recorded": false,
+        "lawful_acquisition_basis_recorded": false
+      }
+    },
+    {
+      "asset_id": "bili-volkath-pro-gameplay",
+      "platform": "Bilibili",
+      "source_url": "https://www.bilibili.tv/en/video/2047207342",
+      "title": "AoV : VOLKATH PRO GAMEPLAY | BEST BUILD",
+      "uploader": "Chris Nero",
+      "suspected_rights_holders": [
+        "Uploader/source-video owner",
+        "Garena/Tencent or relevant game publisher"
+      ],
+      "game_publisher": "Garena/Tencent (game rights may be separate from video rights)",
+      "footage_type": "unknown",
+      "duration_seconds": null,
+      "selected_timecode": null,
+      "narration_purpose": "Possible Volkath gameplay; lore event itself is not established by title.",
+      "rights_status": "EXCEPTION_REVIEW",
+      "acquisition_status": "NOT_ACQUIRED",
+      "license_or_authorization_evidence": "Bilibili page title/uploader visible; page prohibits repost without creator permission. No frames or timecodes verified.",
+      "review_date": "2026-10-13",
+      "reviewer": "Yuzhen AI Studio internal evidence review",
+      "final_status": "WAITING_FOR_RIGHTS_REVIEW",
+      "timecode_status": "UNVERIFIED",
+      "game_identity_verified": false,
+      "can_import_now": false,
+      "copyright_exception_assessment": {
+        "jurisdiction": "Vietnam (provisional; production account/territory and applicable law not independently confirmed)",
+        "jurisdiction_confirmed": false,
+        "purpose": "Commentary/analysis contrasting the independently sourced 2019 Athanor lore account with the dated in-game Arrow of Chaos mechanic; not a general compilation.",
+        "supporting_factors": [
+          "The draft has an original Vietnamese narration and a specific lore-versus-historical-mechanic question.",
+          "A candidate could serve as evidence for a line of commentary if the exact segment directly relates to that point."
+        ],
+        "opposing_factors": [
+          "The current script analyzes the lore/mechanic, not the source creator’s particular editing or creative choices; direct criticism of the source video is weak or absent.",
+          "No clip content, exact timecode, amount, or scene relevance has been frame-verified.",
+          "Uploader, broadcast, underlying game, music, and third-party rights are unresolved.",
+          "Commercial intent increases the need to assess licensing markets; no exception determination or permission is recorded.",
+          "Search-page visibility does not establish an allowed download or local-edit method."
+        ],
+        "human_assessment_recorded": false,
+        "lawful_acquisition_basis_recorded": false
+      }
+    },
+    {
+      "asset_id": "bili-volkath-cinematic",
+      "platform": "Bilibili",
+      "source_url": "https://www.bilibili.tv/video/2043948997",
+      "title": "AOV VOLKATH - CINEMATIC TRAILER…",
+      "uploader": "bili_1517568386",
+      "suspected_rights_holders": [
+        "Uploader/source-video owner",
+        "Garena/Tencent or relevant game publisher"
+      ],
+      "game_publisher": "Garena/Tencent (game rights may be separate from video rights)",
+      "footage_type": "unknown",
+      "duration_seconds": null,
+      "selected_timecode": null,
+      "narration_purpose": "Volkath cinematic, potentially relevant to hook/setup; exact arrow/death beat unknown.",
+      "rights_status": "EXCEPTION_REVIEW",
+      "acquisition_status": "NOT_ACQUIRED",
+      "license_or_authorization_evidence": "Bilibili page title and uploader metadata visible; page prohibits repost without creator permission. No frames, duration, or ownership chain verified.",
+      "review_date": "2026-10-13",
+      "reviewer": "Yuzhen AI Studio internal evidence review",
+      "final_status": "WAITING_FOR_RIGHTS_REVIEW",
+      "timecode_status": "UNVERIFIED",
+      "game_identity_verified": false,
+      "can_import_now": false,
+      "copyright_exception_assessment": {
+        "jurisdiction": "Vietnam (provisional; production account/territory and applicable law not independently confirmed)",
+        "jurisdiction_confirmed": false,
+        "purpose": "Commentary/analysis contrasting the independently sourced 2019 Athanor lore account with the dated in-game Arrow of Chaos mechanic; not a general compilation.",
+        "supporting_factors": [
+          "The draft has an original Vietnamese narration and a specific lore-versus-historical-mechanic question.",
+          "A candidate could serve as evidence for a line of commentary if the exact segment directly relates to that point."
+        ],
+        "opposing_factors": [
+          "The current script analyzes the lore/mechanic, not the source creator’s particular editing or creative choices; direct criticism of the source video is weak or absent.",
+          "No clip content, exact timecode, amount, or scene relevance has been frame-verified.",
+          "Uploader, broadcast, underlying game, music, and third-party rights are unresolved.",
+          "Commercial intent increases the need to assess licensing markets; no exception determination or permission is recorded.",
+          "Search-page visibility does not establish an allowed download or local-edit method."
+        ],
+        "human_assessment_recorded": false,
+        "lawful_acquisition_basis_recorded": false
+      }
+    },
+    {
+      "asset_id": "bili-volkath-monsters",
+      "platform": "Bilibili",
+      "source_url": "https://www.bilibili.tv/en/video/2042623539",
+      "title": "AoV: Volkath!!!!The Monsters Highlights | Arena of Valor | KYRO??",
+      "uploader": "KYRO (listed creator; not independently verified)",
+      "suspected_rights_holders": [
+        "Uploader/source-video owner",
+        "Garena/Tencent or relevant game publisher"
+      ],
+      "game_publisher": "Garena/Tencent (game rights may be separate from video rights)",
+      "footage_type": "unknown",
+      "duration_seconds": null,
+      "selected_timecode": null,
+      "narration_purpose": "Potential title-level match only; not frame-verified.",
+      "rights_status": "EXCEPTION_REVIEW",
+      "acquisition_status": "NOT_ACQUIRED",
+      "license_or_authorization_evidence": "Only existing search metadata is available; the video page/content and rights could not be verified in this review.",
+      "review_date": "2026-10-13",
+      "reviewer": "Yuzhen AI Studio internal evidence review",
+      "final_status": "WAITING_FOR_RIGHTS_REVIEW",
+      "timecode_status": "UNVERIFIED",
+      "game_identity_verified": false,
+      "can_import_now": false,
+      "copyright_exception_assessment": {
+        "jurisdiction": "Vietnam (provisional; production account/territory and applicable law not independently confirmed)",
+        "jurisdiction_confirmed": false,
+        "purpose": "Commentary/analysis contrasting the independently sourced 2019 Athanor lore account with the dated in-game Arrow of Chaos mechanic; not a general compilation.",
+        "supporting_factors": [
+          "The draft has an original Vietnamese narration and a specific lore-versus-historical-mechanic question.",
+          "A candidate could serve as evidence for a line of commentary if the exact segment directly relates to that point."
+        ],
+        "opposing_factors": [
+          "The current script analyzes the lore/mechanic, not the source creator’s particular editing or creative choices; direct criticism of the source video is weak or absent.",
+          "No clip content, exact timecode, amount, or scene relevance has been frame-verified.",
+          "Uploader, broadcast, underlying game, music, and third-party rights are unresolved.",
+          "Commercial intent increases the need to assess licensing markets; no exception determination or permission is recorded.",
+          "Search-page visibility does not establish an allowed download or local-edit method."
+        ],
+        "human_assessment_recorded": false,
+        "lawful_acquisition_basis_recorded": false
+      }
+    },
+    {
+      "asset_id": "bili-volkath-new-hero",
+      "platform": "Bilibili",
+      "source_url": "https://www.bilibili.tv/video/2043724626",
+      "title": "傳說對決 AOV HERO BARU VOLKATH ARENA OF VALOR|LiênQuân|ROV",
+      "uploader": "Creator not verified",
+      "suspected_rights_holders": [
+        "Uploader/source-video owner",
+        "Garena/Tencent or relevant game publisher"
+      ],
+      "game_publisher": "Garena/Tencent (game rights may be separate from video rights)",
+      "footage_type": "unknown",
+      "duration_seconds": null,
+      "selected_timecode": null,
+      "narration_purpose": "Potential title-level match only; not frame-verified.",
+      "rights_status": "EXCEPTION_REVIEW",
+      "acquisition_status": "NOT_ACQUIRED",
+      "license_or_authorization_evidence": "Only existing search metadata is available; the video page/content and rights could not be verified in this review.",
+      "review_date": "2026-10-13",
+      "reviewer": "Yuzhen AI Studio internal evidence review",
+      "final_status": "WAITING_FOR_RIGHTS_REVIEW",
+      "timecode_status": "UNVERIFIED",
+      "game_identity_verified": false,
+      "can_import_now": false,
+      "copyright_exception_assessment": {
+        "jurisdiction": "Vietnam (provisional; production account/territory and applicable law not independently confirmed)",
+        "jurisdiction_confirmed": false,
+        "purpose": "Commentary/analysis contrasting the independently sourced 2019 Athanor lore account with the dated in-game Arrow of Chaos mechanic; not a general compilation.",
+        "supporting_factors": [
+          "The draft has an original Vietnamese narration and a specific lore-versus-historical-mechanic question.",
+          "A candidate could serve as evidence for a line of commentary if the exact segment directly relates to that point."
+        ],
+        "opposing_factors": [
+          "The current script analyzes the lore/mechanic, not the source creator’s particular editing or creative choices; direct criticism of the source video is weak or absent.",
+          "No clip content, exact timecode, amount, or scene relevance has been frame-verified.",
+          "Uploader, broadcast, underlying game, music, and third-party rights are unresolved.",
+          "Commercial intent increases the need to assess licensing markets; no exception determination or permission is recorded.",
+          "Search-page visibility does not establish an allowed download or local-edit method."
+        ],
+        "human_assessment_recorded": false,
+        "lawful_acquisition_basis_recorded": false
+      }
+    },
+    {
+      "asset_id": "bili-telannas-spotlight",
+      "platform": "Bilibili",
+      "source_url": "https://www.bilibili.tv/video/2048186169",
+      "title": "Tel'Annas - Hero Spotlight Garena AOV (Arena of Valor)",
+      "uploader": "Uploader not verified",
+      "suspected_rights_holders": [
+        "Uploader/source-video owner",
+        "Garena/Tencent or relevant game publisher"
+      ],
+      "game_publisher": "Garena/Tencent (game rights may be separate from video rights)",
+      "footage_type": "unknown",
+      "duration_seconds": null,
+      "selected_timecode": null,
+      "narration_purpose": "Tel’Annas visual reference could fit scene 3; exact first-invasion narrative not verified.",
+      "rights_status": "EXCEPTION_REVIEW",
+      "acquisition_status": "NOT_ACQUIRED",
+      "license_or_authorization_evidence": "Bilibili page title/date/uploader visible; repost prohibited without creator permission. Title suggests a hero spotlight, but page does not verify footage source or any scene.",
+      "review_date": "2026-10-13",
+      "reviewer": "Yuzhen AI Studio internal evidence review",
+      "final_status": "WAITING_FOR_RIGHTS_REVIEW",
+      "timecode_status": "UNVERIFIED",
+      "game_identity_verified": false,
+      "can_import_now": false,
+      "copyright_exception_assessment": {
+        "jurisdiction": "Vietnam (provisional; production account/territory and applicable law not independently confirmed)",
+        "jurisdiction_confirmed": false,
+        "purpose": "Commentary/analysis contrasting the independently sourced 2019 Athanor lore account with the dated in-game Arrow of Chaos mechanic; not a general compilation.",
+        "supporting_factors": [
+          "The draft has an original Vietnamese narration and a specific lore-versus-historical-mechanic question.",
+          "A candidate could serve as evidence for a line of commentary if the exact segment directly relates to that point."
+        ],
+        "opposing_factors": [
+          "The current script analyzes the lore/mechanic, not the source creator’s particular editing or creative choices; direct criticism of the source video is weak or absent.",
+          "No clip content, exact timecode, amount, or scene relevance has been frame-verified.",
+          "Uploader, broadcast, underlying game, music, and third-party rights are unresolved.",
+          "Commercial intent increases the need to assess licensing markets; no exception determination or permission is recorded.",
+          "Search-page visibility does not establish an allowed download or local-edit method."
+        ],
+        "human_assessment_recorded": false,
+        "lawful_acquisition_basis_recorded": false
+      }
+    },
+    {
+      "asset_id": "bili-volkath-shogun",
+      "platform": "Bilibili",
+      "source_url": "https://www.bilibili.tv/video/2041465865",
+      "title": "Volkath Shogun Skin Spotlight - Garena AOV",
+      "uploader": "Uploader not verified",
+      "suspected_rights_holders": [
+        "Uploader/source-video owner",
+        "Garena/Tencent or relevant game publisher"
+      ],
+      "game_publisher": "Garena/Tencent (game rights may be separate from video rights)",
+      "footage_type": "unknown",
+      "duration_seconds": null,
+      "selected_timecode": null,
+      "narration_purpose": "Potential title-level match only; not frame-verified.",
+      "rights_status": "UNUSABLE",
+      "acquisition_status": "NOT_ACQUIRED",
+      "license_or_authorization_evidence": "Only existing search metadata is available; the video page/content and rights could not be verified in this review. Existing assessment classifies this URL unusable or editorially mismatched; no evidence to reverse the classification.",
+      "review_date": "2026-10-13",
+      "reviewer": "Yuzhen AI Studio internal evidence review",
+      "final_status": "UNUSABLE",
+      "timecode_status": "UNVERIFIED",
+      "game_identity_verified": false,
+      "can_import_now": false,
+      "copyright_exception_assessment": {
+        "jurisdiction": null,
+        "jurisdiction_confirmed": false,
+        "purpose": null,
+        "supporting_factors": [],
+        "opposing_factors": [
+          "Asset is editorially unsuitable for this story."
+        ],
+        "human_assessment_recorded": false,
+        "lawful_acquisition_basis_recorded": false
+      }
+    },
+    {
+      "asset_id": "vimeo-volkath-darklord",
+      "platform": "Vimeo",
+      "source_url": "https://vimeo.com/710641586",
+      "title": "Volkath - The Darklord - Arena of Valor",
+      "uploader": "Creator not verified",
+      "suspected_rights_holders": [
+        "Uploader/source-video owner",
+        "Garena/Tencent or relevant game publisher"
+      ],
+      "game_publisher": "Garena/Tencent (game rights may be separate from video rights)",
+      "footage_type": "unknown",
+      "duration_seconds": null,
+      "selected_timecode": null,
+      "narration_purpose": "Potential title-level match only; not frame-verified.",
+      "rights_status": "EXCEPTION_REVIEW",
+      "acquisition_status": "NOT_ACQUIRED",
+      "license_or_authorization_evidence": "Only existing search metadata is available; the video page/content and rights could not be verified in this review.",
+      "review_date": "2026-10-13",
+      "reviewer": "Yuzhen AI Studio internal evidence review",
+      "final_status": "WAITING_FOR_RIGHTS_REVIEW",
+      "timecode_status": "UNVERIFIED",
+      "game_identity_verified": false,
+      "can_import_now": false,
+      "copyright_exception_assessment": {
+        "jurisdiction": "Vietnam (provisional; production account/territory and applicable law not independently confirmed)",
+        "jurisdiction_confirmed": false,
+        "purpose": "Commentary/analysis contrasting the independently sourced 2019 Athanor lore account with the dated in-game Arrow of Chaos mechanic; not a general compilation.",
+        "supporting_factors": [
+          "The draft has an original Vietnamese narration and a specific lore-versus-historical-mechanic question.",
+          "A candidate could serve as evidence for a line of commentary if the exact segment directly relates to that point."
+        ],
+        "opposing_factors": [
+          "The current script analyzes the lore/mechanic, not the source creator’s particular editing or creative choices; direct criticism of the source video is weak or absent.",
+          "No clip content, exact timecode, amount, or scene relevance has been frame-verified.",
+          "Uploader, broadcast, underlying game, music, and third-party rights are unresolved.",
+          "Commercial intent increases the need to assess licensing markets; no exception determination or permission is recorded.",
+          "Search-page visibility does not establish an allowed download or local-edit method."
+        ],
+        "human_assessment_recorded": false,
+        "lawful_acquisition_basis_recorded": false
+      }
+    }
+  ]
+}

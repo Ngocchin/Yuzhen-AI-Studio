@@ -32,6 +32,8 @@ The Director estimates Storytelling, Viral Potential, and Media Feasibility sepa
 
 Before planning revenue, use the rights categories and source-linked review in `config/media-rights-policy.json`. Monetization review is platform-specific and is not a guarantee. YouTube reused-content eligibility and copyright/Content ID are separate questions. TikTok Creator Rewards has its own account, region, originality, quality, and duration conditions; branded or affiliate content has separate disclosure and music considerations. See current linked policy pages in the production report; always recheck before publishing.
 
+For Production #004's current source decision, see `reports/media-rights-review.md`, `reports/copyright-exception-candidates.md`, `reports/monetization-review.md`, and its six-scene EDL. No candidate is cleared. To supply a review copy without a terminal, attach the file in Codex and include rights/scope details; see `docs/media-ingestion.md`. Cloud has no durable media-storage connector configured, so reattach media in later Cloud tasks unless storage is configured.
+
 Automated QC checks file metadata and audio/video stream presence; human listening and viewing remain necessary to judge voice quality, rights, subtitle readability, black frames, and creative quality. Agent role definitions are in `agents/`; executable role mapping is in `config/agents.json`, and defaults are in `config/defaults.json`. The Director runs sequentially with checkpoints; this runtime does not claim live subagent execution. Run all local checks with `python3 -m unittest discover -s tests`.
 
 ## Director and agents

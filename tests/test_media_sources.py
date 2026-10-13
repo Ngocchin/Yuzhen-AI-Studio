@@ -1,6 +1,6 @@
 import unittest
 
-from pipeline.media_sources import classify_rights, classify_source
+from pipeline.media_sources import classify_rights, classify_source, media_workflow_status
 
 
 class MediaSourceRightsTests(unittest.TestCase):
@@ -126,6 +126,7 @@ class MediaSourceRightsTests(unittest.TestCase):
             "title": "Licensed game asset", "source_url": "https://stock.example/clip", "owner": "Stock owner",
             "rights_evidence": {
                 "basis": "license", "license_url": "https://stock.example/license",
+                "license_verified": True,
                 "permitted_platforms": ["youtube", "tiktok"], "commercial_use": True,
                 "editing_allowed": True, "underlying_rights_cleared": True,
                 "scope": "Commercial vertical video", "attribution_required": True,
@@ -134,6 +135,69 @@ class MediaSourceRightsTests(unittest.TestCase):
         self.assertEqual(classify_rights(candidate)["category"], "UNUSABLE")
         candidate["rights_evidence"]["attribution_text"] = "Stock owner / license URL"
         self.assertEqual(classify_rights(candidate)["category"], "LICENSED_OR_PERMITTED")
+
+    def test_verified_cc_by_with_attribution_and_underlying_rights_is_permitted(self):
+        source = {
+            "title": "CC clip", "source_url": "https://example.org/clip", "owner": "Creator",
+            "attribution": "Creator, CC BY 4.0",
+            "rights_evidence": {
+                "basis": "license", "license_name": "CC BY 4.0",
+                "license_url": "https://creativecommons.org/licenses/by/4.0/",
+                "license_verified": True, "permitted_platforms": ["youtube", "tiktok"],
+                "commercial_use": True, "editing_allowed": True,
+                "underlying_rights_cleared": True, "scope": "Commercial edited Shorts",
+                "attribution_required": True, "attribution_text": "Creator, CC BY 4.0",
+            },
+        }
+        self.assertEqual(classify_rights(source)["category"], "LICENSED_OR_PERMITTED")
+
+    def test_stitch_permission_is_platform_only(self):
+        source = {"title": "Clip", "source_url": "https://tiktok.com/@creator/video/5", "owner": "Creator",
+                  "rights_evidence": {"platform_remix": {"enabled_by_owner": True, "feature": "stitch", "platform": "tiktok", "native_feature_only": True, "verification_record": "checked"}}}
+        result = classify_rights(source)
+        self.assertEqual(result["category"], "PLATFORM_REMIX")
+        self.assertEqual(media_workflow_status(result, file_present=True, file_verified=True, acquisition_permitted=False), "WAITING_FOR_RIGHTS_REVIEW")
+
+    def test_esports_broadcast_requires_broadcaster_rights_separately(self):
+        source = {"title": "Finals", "source_url": "https://example.org/final", "owner": "Team",
+                  "broadcast_footage": True,
+                  "rights_evidence": {"basis": "written_permission", "permission_record": "creator-grant",
+                    "permitted_platforms": ["youtube", "tiktok"], "commercial_use": True, "editing_allowed": True,
+                    "underlying_rights_cleared": True, "scope": "clips"}}
+        self.assertEqual(classify_rights(source)["category"], "UNUSABLE")
+        source["rights_evidence"]["broadcaster_rights_cleared"] = True
+        self.assertEqual(classify_rights(source)["category"], "LICENSED_OR_PERMITTED")
+
+    def test_commercial_music_rights_are_a_separate_gate(self):
+        source = {"title": "Clip", "source_url": "https://example.org/clip", "owner": "Creator", "contains_music": True,
+                  "rights_evidence": {"basis": "written_permission", "permission_record": "grant",
+                    "permitted_platforms": ["youtube", "tiktok"], "commercial_use": True, "editing_allowed": True,
+                    "underlying_rights_cleared": True, "scope": "commercial video"}}
+        self.assertEqual(classify_rights(source)["category"], "UNUSABLE")
+        source["rights_evidence"]["music_rights_cleared"] = True
+        self.assertEqual(classify_rights(source)["category"], "LICENSED_OR_PERMITTED")
+
+    def test_organic_monetization_permission_does_not_cover_sponsorship(self):
+        source = {"title": "Clip", "source_url": "https://example.org/clip", "owner": "Creator",
+                  "rights_evidence": {"basis": "written_permission", "permission_record": "grant",
+                    "permitted_platforms": ["youtube", "tiktok"], "commercial_use": True, "editing_allowed": True,
+                    "underlying_rights_cleared": True, "scope": "monetized organic videos",
+                    "permitted_commercial_contexts": ["creator_monetization"]}}
+        self.assertEqual(classify_rights(source)["category"], "LICENSED_OR_PERMITTED")
+        self.assertEqual(classify_rights(source, commercial_context="sponsorship")["category"], "UNUSABLE")
+
+    def test_licensed_source_without_local_media_waits_for_file(self):
+        source = {"title": "Clip", "source_url": "https://example.org/clip", "owner": "Creator",
+                  "rights_evidence": {"basis": "written_permission", "permission_record": "grant",
+                    "permitted_platforms": ["youtube", "tiktok"], "commercial_use": True, "editing_allowed": True,
+                    "underlying_rights_cleared": True, "scope": "edited Shorts"}}
+        result = classify_rights(source)
+        self.assertEqual(media_workflow_status(result, file_present=False, file_verified=False, acquisition_permitted=True), "WAITING_FOR_FILE")
+
+    def test_revoked_permission_is_unusable(self):
+        source = {"title": "Clip", "source_url": "https://example.org/clip", "owner": "Creator",
+                  "rights_evidence": {"revoked": True, "basis": "written_permission", "permission_record": "revoked"}}
+        self.assertEqual(classify_rights(source)["category"], "UNUSABLE")
 
 
 if __name__ == "__main__":

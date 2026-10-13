@@ -48,6 +48,7 @@ def classify_rights(
     *,
     target_platforms: tuple[str, ...] = ("youtube", "tiktok"),
     commercial_use: bool = True,
+    commercial_context: str = "creator_monetization",
 ) -> dict:
     """Classify a source and report evidence/risk without making a legal finding.
 
@@ -64,9 +65,11 @@ def classify_rights(
     owner = source.get("owner") or source.get("creator")
     source_url = source.get("source_url", "")
 
-    if (evidence.get("prohibited") is True or evidence.get("drm_or_access_bypass_required") is True
+    if (evidence.get("revoked") is True or evidence.get("prohibited") is True or evidence.get("drm_or_access_bypass_required") is True
             or source.get("acquisition_bypassed_controls") is True or source.get("editorial_unsuitable") is True):
-        reason = "Asset is editorially unsuitable for this story." if source.get("editorial_unsuitable") is True else "Use is prohibited or would require bypassing access controls/DRM."
+        reason = ("Recorded permission was revoked." if evidence.get("revoked") is True else
+                  "Asset is editorially unsuitable for this story." if source.get("editorial_unsuitable") is True else
+                  "Use is prohibited or would require bypassing access controls/DRM.")
         return {
             "category": "UNUSABLE", "status": "UNUSABLE", "operationally_cleared": False,
             "reason": reason,
@@ -93,12 +96,20 @@ def classify_rights(
 
     basis = str(evidence.get("basis", "")).strip()
     permitted = set(evidence.get("permitted_platforms") or [])
+    rights_holders_cleared = evidence.get("underlying_rights_cleared") is True
+    if source.get("broadcast_footage") is True or source.get("footage_type") in {"broadcast", "esports_broadcast", "live_broadcast"}:
+        rights_holders_cleared = rights_holders_cleared and evidence.get("broadcaster_rights_cleared") is True
+    if source.get("contains_music") is True:
+        rights_holders_cleared = rights_holders_cleared and evidence.get("music_rights_cleared") is True
+    if commercial_context not in {"creator_monetization", "organic_post"}:
+        rights_holders_cleared = rights_holders_cleared and commercial_context in set(evidence.get("permitted_commercial_contexts") or [])
     licensed = (
         basis in {"user_ownership", "written_permission", "license", "publisher_policy"}
         and (basis == "user_ownership" or _http_url(evidence.get("license_url", "")) or bool(evidence.get("permission_record")))
+        and (basis != "license" or evidence.get("license_verified") is True)
         and set(target_platforms).issubset(permitted)
         and evidence.get("editing_allowed") is True
-        and evidence.get("underlying_rights_cleared") is True
+        and rights_holders_cleared
         and bool(evidence.get("scope"))
         and (evidence.get("attribution_required") is not True or bool(evidence.get("attribution_text") or source.get("attribution")))
         and (not commercial_use or evidence.get("commercial_use") is True)
@@ -107,10 +118,11 @@ def classify_rights(
         return {
             "category": "LICENSED_OR_PERMITTED", "status": "AUTHORIZED",
             "operationally_cleared": True,
-            "reason": "Recorded permission covers requested platforms, editing, relevant underlying rights, and commercial use where requested.",
+            "reason": "Recorded permission covers requested platforms, editing, relevant rights holders, and the requested commercial context.",
             "supporting_factors": ["Explicit license/permission basis", "Scope and target platforms recorded", "Editing and underlying rights recorded"],
             "opposing_factors": [], "review_required": False,
             "target_platforms": list(target_platforms), "commercial_use": commercial_use,
+            "commercial_context": commercial_context,
         }
 
     remix = evidence.get("platform_remix") or {}
@@ -163,6 +175,8 @@ def classify_rights(
             and assessment.get("rights_holders_reviewed") is True
             and set(target_platforms).issubset(set(assessment.get("platforms") or []))
             and (not commercial_use or assessment.get("commercial_use") is True)
+            and (commercial_context in {"creator_monetization", "organic_post"}
+                 or commercial_context in set(assessment.get("permitted_commercial_contexts") or []))
             and bool(assessment.get("scope"))
             and exception.get("source_access_legitimate") is True
         )
@@ -207,6 +221,20 @@ def classify_source(source: dict) -> dict:
     else:
         legacy = result["status"]
     return {**result, "status": legacy}
+
+
+def media_workflow_status(classification: dict, *, file_present: bool, file_verified: bool,
+                          acquisition_permitted: bool) -> str:
+    """Return the production gate state independently from legal categorization."""
+    if classification.get("category") == "UNUSABLE":
+        return "UNUSABLE"
+    if not classification.get("operationally_cleared"):
+        return "WAITING_FOR_RIGHTS_REVIEW"
+    if not acquisition_permitted:
+        return "WAITING_FOR_RIGHTS_REVIEW"
+    if not file_present or not file_verified:
+        return "WAITING_FOR_FILE"
+    return "READY_FOR_EDIT"
 
 
 def asset_id(file_path: str | Path, source_url: str) -> str:
