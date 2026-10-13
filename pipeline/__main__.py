@@ -13,7 +13,6 @@ from pipeline import story_strategy
 from pipeline.media_feasibility import score_media_feasibility
 from pipeline.topic_queue import record_waiting_topic
 from pipeline.media_sources import classify_source
-from pipeline.event_storytelling import DEFAULT_STYLE, load_style, render_original_graphics
 from pipeline.real_footage import preflight_real_footage
 from pipeline.topic_queue import DEFAULT_SOURCE_LEDGER, filter_previously_rejected, record_source_decision
 
@@ -204,10 +203,12 @@ def run(args):
         if rendered["status"] == "rendered":
             checkpoint["phases"]["quality_control"] = quality_control(out / "video.mp4", script["duration_seconds"] + settings["meme_pause_seconds"])
     else:
-        rendered = render_original_graphics(script, voice, out, load_style(DEFAULT_STYLE))
-        checkpoint["phases"]["render"] = {**rendered, "status": "rendered" if rendered.get("status") == "rendered" else rendered.get("status"), "media_mode": "ORIGINAL_GRAPHICS_FALLBACK"}
-        if rendered.get("status") == "rendered":
-            checkpoint["phases"]["quality_control"] = quality_control(out / "video.mp4", rendered["duration_seconds"])
+        checkpoint["phases"]["render"] = {
+            "status": "blocked",
+            "code": "NEEDS_ASSETS",
+            "reason": "No rights-cleared, scene-matched gameplay was supplied. Mobile storytelling does not fall back to vector graphics.",
+            "style_profile": policy["production"].get("video_style", "yuzhen-mobile-storytelling"),
+        }
     checkpoint["status"] = "checkpoint_saved"
     checkpoint["director"] = {
         "status": "complete_with_blocked_phases" if checkpoint["phases"].get("render", {}).get("status") == "blocked" or checkpoint["phases"].get("voice", {}).get("status") == "blocked" else "complete",

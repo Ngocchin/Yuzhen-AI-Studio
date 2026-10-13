@@ -106,7 +106,7 @@ class StudioPipelineTests(unittest.TestCase):
             self.assertEqual(json.loads((existing / "script.json").read_text())["title"], "keep me")
             self.assertTrue((root / "outputs/lien-quan-mobile-production-002/checkpoint.json").exists())
 
-    def test_public_or_unlicensed_gameplay_is_not_used_when_graphic_fallback_is_possible(self):
+    def test_unlicensed_gameplay_does_not_trigger_graphic_fallback(self):
         with tempfile.TemporaryDirectory() as temp, patch.object(studio, "ROOT", Path(temp)):
             root = Path(temp)
             (root / "config").mkdir()
@@ -119,10 +119,12 @@ class StudioPipelineTests(unittest.TestCase):
                 wav.setsampwidth(2)
                 wav.setframerate(22050)
                 wav.writeframes(b"\0\0" * 22050)
-            with patch.object(studio, "render_original_graphics", return_value={"status": "rendered", "duration_seconds": 35.0}) as graphic, patch.object(studio, "render_video") as gameplay_render:
+            with patch.object(studio, "render_original_graphics") as graphic, patch.object(studio, "render_video") as gameplay_render:
                 studio.run(Namespace(game="Liên Quân Mobile", mode="ENTERTAINMENT", voice=str(voice_path)))
-            graphic.assert_called_once()
+            graphic.assert_not_called()
             gameplay_render.assert_not_called()
+            checkpoint = json.loads((root / "outputs/lien-quan-mobile/checkpoint.json").read_text())
+            self.assertEqual(checkpoint["phases"]["render"]["code"], "NEEDS_ASSETS")
 
     def test_generated_voice_is_accepted_for_render(self):
         with tempfile.TemporaryDirectory() as temp, patch.object(studio, "ROOT", Path(temp)):
