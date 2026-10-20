@@ -1,0 +1,12 @@
+{
+  "id": "yuzhen-event-storytelling",
+  "version": 1,
+  "canvas": {"width": 1080, "height": 1920, "fps": 30, "aspect_ratio": "9:16", "duration_min_seconds": 35, "duration_max_seconds": 60},
+  "palette": {"background": "#071522", "surface": "#10283B", "blue": "#168FE8", "cyan": "#57D9FF", "white": "#F5FAFF", "muted": "#B6C8D8", "highlight": "#FFD66B"},
+  "typography": {"font_regular": "/usr/share/fonts/truetype/noto/NotoSans-Regular.ttf", "font_bold": "/usr/share/fonts/truetype/noto/NotoSans-Bold.ttf", "caption_color": "#FFFFFF", "caption_outline": "#071522", "caption_outline_width": 4, "caption_font_size": 40},
+  "safe_area": {"left": 88, "right": 88, "top": 170, "bottom": 250},
+  "captions": {"position": "bottom-center", "max_lines": 2, "highlight_keywords": true, "highlight_color": "#FFD66B"},
+  "motion": {"scene_transition_seconds": 0.28, "zoom_start": 1.0, "zoom_end": 1.055, "pan_amplitude_pixels": 18, "background_blur_radius": 18, "callouts": true},
+  "audio": {"voice_profile": "Minh Quân", "music_target_db_below_voice": 20, "meme_pause_seconds": 0.65, "music_optional": true},
+  "branding": {"logo": null, "creator_reference_logo_allowed": false, "design_note": "Use Yuzhen's original blue editorial graphics; do not reproduce another creator's logo or exact layout."}
+}

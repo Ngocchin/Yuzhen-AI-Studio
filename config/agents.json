@@ -3,12 +3,15 @@
   "execution": "sequential_checkpointed",
   "agents": [
     {"id":"00","name":"DIRECTOR","phase":"orchestration","implementation":"pipeline/__main__.py","coordinates":["01","02","03","04","05","06","07"]},
-    {"id":"01","name":"TREND HUNTER","phase":"trend_hunter","implementation":"news evidence gate","modes":["NEWS"]},
-    {"id":"02","name":"CONTENT STRATEGIST","phase":"ideas","implementation":"Entertainment idea selection"},
-    {"id":"03","name":"SCRIPT WRITER","phase":"script_storyboard","implementation":"timed Vietnamese script and scenes"},
-    {"id":"04","name":"VOICE PRODUCER","phase":"voice","implementation":"pipeline/voice.py"},
+    {"id":"01","name":"TREND HUNTER","phase":"trend_hunter","implementation":"story research and evidence gate","modes":["NEWS","ENTERTAINMENT"]},
+    {"id":"02","name":"CONTENT STRATEGIST","phase":"ideas","implementation":"pipeline/story_strategy.py; story-first hard filter and scoring"},
+    {"id":"03","name":"SCRIPT WRITER","phase":"script_storyboard","implementation":"source-bound Vietnamese gaming storytelling"},
+    {"id":"04","name":"VOICE PRODUCER","phase":"voice","implementation":"VieNeu-TTS 3.7.1 Minh Quân required; block if unavailable"},
     {"id":"05","name":"VIDEO EDITOR","phase":"render","implementation":"FFmpeg renderer"},
     {"id":"06","name":"QUALITY CONTROL","phase":"quality_control","implementation":"ffprobe media checks plus human review flags"},
     {"id":"07","name":"CHANNEL MANAGER","phase":"channel_manager","implementation":"platform copy generation"}
+  ],
+  "supporting_agents": [
+    {"id":"08","name":"MEDIA HUNTER","phase":"media_sourcing_preflight","implementation":"agents/08-media-hunter.md","supports":"05","modes":["NEWS","ENTERTAINMENT"],"required_evidence":["asset_url","owner","license_terms","commercial_use_scope","attribution"]}
   ]
 }

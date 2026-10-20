@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "policy": "Do not rewrite dialogue automatically. Add a spoken_override only after a person listens and confirms the desired pronunciation.",
+  "entries": [
+    {"term": "Liên Quân Mobile", "spoken_override": null, "status": "needs_human_review"},
+    {"term": "Combat", "spoken_override": null, "status": "needs_human_review"},
+    {"term": "Farm", "spoken_override": null, "status": "needs_human_review"},
+    {"term": "Gank", "spoken_override": null, "status": "needs_human_review"},
+    {"term": "Rank", "spoken_override": null, "status": "needs_human_review"},
+    {"term": "Feed", "spoken_override": null, "status": "needs_human_review"},
+    {"term": "Buff", "spoken_override": null, "status": "needs_human_review"},
+    {"term": "Tốc Biến", "spoken_override": null, "status": "needs_human_review"},
+    {"term": "Ăn Rồng", "spoken_override": null, "status": "needs_human_review"},
+    {"term": "Ăn Caesar", "spoken_override": null, "status": "needs_human_review"},
+    {"term": "Tên tướng Liên Quân", "spoken_override": null, "status": "needs_human_review", "examples": []}
+  ]
+}

@@ -114,7 +114,12 @@ def _canonical_voice(tts, requested_name: str) -> str:
         raise ValueError("The Adam preset is excluded by the project voice policy.")
     available = tts.list_preset_voices()
     installed_names = {canonical for _, canonical in available}
-    resolved = tts.resolve_voice_name(requested_name)
+    # Older locked SDK releases expose the exact preset name directly, while
+    # newer releases may retain renamed presets through a resolver alias.
+    resolved = requested_name if requested_name in installed_names else None
+    resolver = getattr(tts, "resolve_voice_name", None)
+    if not resolved and resolver:
+        resolved = resolver(requested_name)
     if not resolved or resolved not in installed_names:
         raise ValueError(f"Voice {requested_name!r} is unavailable in this installed SDK roster.")
     return resolved
@@ -149,6 +154,126 @@ def _synthesize(tts, requested_name: str, output: Path, text: str | None = None)
         output.unlink(missing_ok=True)
         return {"status": "invalid", "validation": check}
     return {"status": "generated", "requested_voice": requested_name, "canonical_voice": canonical, "path": str(output), "sha256": hashlib.sha256(output.read_bytes()).hexdigest(), "validation": check}
+
+
+PREVIEW_SCRIPTS = {
+    "A": {
+        "label": "CASUAL STORYTELLING",
+        "segments": [
+            ("Tui nói thiệt nha, chơi Liên Quân đôi khi không sợ team địch mạnh.", 0.22),
+            ("Chỉ sợ đồng đội mình tự tin quá thôi!", 0.0),
+        ],
+    },
+    "B": {
+        "label": "HYPE GAMING",
+        "segments": [
+            ("Ủa khoan khoan!", 0.15),
+            ("Team mình đang combat kìa!", 0.18),
+            ("Đợi tui một xíu...", 0.36),
+            ("Trời ơi! Tui vừa tới nơi thì cả team bay màu hết rồi!", 0.0),
+        ],
+    },
+    "C": {
+        "label": "MEME REACTION",
+        "segments": [
+            ("Tui chỉ xin farm thêm đúng một món thôi mà...", 0.38),
+            ("Ủa? Cái gì vậy?", 0.20),
+            ("Sao nhà mình mất luôn rồi?", 0.18),
+            ("Alo, ai giải thích giùm tui với!", 0.0),
+        ],
+    },
+}
+
+
+def _audio_metrics(path: Path) -> dict:
+    import numpy as np
+    import soundfile as sf
+
+    samples, sample_rate = sf.read(str(path), dtype="float32", always_2d=True)
+    peak = float(np.max(np.abs(samples))) if samples.size else 0.0
+    rms = float(np.sqrt(np.mean(np.square(samples)))) if samples.size else 0.0
+    return {
+        "sample_rate": sample_rate,
+        "channels": int(samples.shape[1]) if samples.ndim > 1 else 1,
+        "peak_dbfs": round(20 * np.log10(max(peak, 1e-12)), 2),
+        "rms_dbfs": round(20 * np.log10(max(rms, 1e-12)), 2),
+        "near_full_scale_samples": int(np.count_nonzero(np.abs(samples) >= 0.999)),
+        "sample_count": int(samples.shape[0]),
+    }
+
+
+def create_min_quan_previews(output_dir: Path | None = None) -> dict:
+    """Generate three text/prosody previews using the exact male Minh Quân preset."""
+    try:
+        tts = _load_engine()
+    except Exception as error:
+        return {"status": "blocked", "reason": str(error), "readiness": readiness()}
+
+    roster = tts.list_preset_voices()
+    if "Minh Quân" not in {voice_name for _, voice_name in roster}:
+        return {
+            "status": "blocked",
+            "reason": "The installed SDK does not list the exact 'Minh Quân' preset. Refusing to substitute or relabel another voice.",
+            "installed_voices": [{"label": label, "preset_id": name} for label, name in roster],
+        }
+    voice_detail = tts.get_preset_voice("Minh Quân")
+    if str(voice_detail.get("gender", "")).casefold() not in ("male", "nam"):
+        return {"status": "blocked", "reason": "The installed Minh Quân preset is not identified as male; refusing to synthesize."}
+
+    if output_dir is None:
+        output_dir = ROOT / "outputs/voice-previews/minh-quan"
+    elif not output_dir.is_absolute():
+        output_dir = ROOT / output_dir
+    if output_dir.exists():
+        return {"status": "refused", "reason": "Preview directory already exists; refusing to overwrite.", "path": str(output_dir)}
+    output_dir.mkdir(parents=True, exist_ok=False)
+
+    import numpy as np
+    import soundfile as sf
+
+    sample_rate = int(tts.sample_rate)
+    results = []
+    for key, preview in PREVIEW_SCRIPTS.items():
+        target = output_dir / f"preview-{key.lower()}.wav"
+        pieces = []
+        for segment, pause_seconds in preview["segments"]:
+            generated = np.asarray(tts.infer(segment, voice="Minh Quân"), dtype=np.float32).reshape(-1)
+            if not generated.size:
+                raise RuntimeError(f"VieNeu returned an empty segment in Preview {key}.")
+            pieces.append(generated)
+            if pause_seconds:
+                pieces.append(np.zeros(round(sample_rate * pause_seconds), dtype=np.float32))
+        sf.write(str(target), np.concatenate(pieces), sample_rate, subtype="PCM_16", format="WAV")
+        validation = validate_wav(target)
+        if validation["status"] != "validated":
+            target.unlink(missing_ok=True)
+            results.append({"status": "invalid", "preview": key, "validation": validation})
+            break
+        results.append({
+            "status": "generated",
+            "preview": key,
+            "label": preview["label"],
+            "preset_id": "Minh Quân",
+            "text": " ".join(segment for segment, _ in preview["segments"]),
+            "path": str(target),
+            "sha256": hashlib.sha256(target.read_bytes()).hexdigest(),
+            "validation": validation,
+            "signal_metrics": _audio_metrics(target),
+        })
+
+    report = {
+        "status": "TECHNICAL_CHECKS_COMPLETE_HUMAN_REVIEW_REQUIRED" if len(results) == 3 and all(item["status"] == "generated" for item in results) else "BLOCKED_OR_PARTIAL",
+        "engine": "VieNeu-TTS v3 Turbo",
+        "sdk_version": __import__("importlib.metadata", fromlist=["version"]).version("vieneu"),
+        "backend": tts.backend,
+        "preset_id": "Minh Quân",
+        "voice_metadata": {"gender": voice_detail.get("gender"), "description": voice_detail.get("description")},
+        "style_control": "The SDK's style parameter is deprecated/ignored. Differences are prompted only by the supplied punctuation, sentence boundaries, and pauses; no forced speed, pitch shift, or SFX is applied.",
+        "human_review_required": ["Vietnamese tone/diacritic pronunciation", "No words cut off", "Gaming terminology intelligibility", "Natural pacing and mode distinction", "Timbre and emotional naturalness", "No audible distortion or abnormal loudness"],
+        "results": results,
+    }
+    (output_dir / "quality-review.json").write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    return {"status": report["status"], **report, "output_dir": str(output_dir)}
 
 
 def create_comparisons(output_dir: Path | None = None) -> dict:
@@ -194,6 +319,8 @@ def main(argv=None) -> int:
     commands.add_parser("voices")
     sample = commands.add_parser("compare")
     sample.add_argument("--output-dir")
+    preview = commands.add_parser("previews")
+    preview.add_argument("--output-dir")
     synth = commands.add_parser("synthesize")
     synth.add_argument("--text", required=True)
     synth.add_argument("--voice", required=True)
@@ -205,6 +332,8 @@ def main(argv=None) -> int:
         result = installed_voices()
     elif args.command == "compare":
         result = create_comparisons(Path(args.output_dir) if args.output_dir else None)
+    elif args.command == "previews":
+        result = create_min_quan_previews(Path(args.output_dir) if args.output_dir else None)
     else:
         try:
             tts = _load_engine()
@@ -215,7 +344,8 @@ def main(argv=None) -> int:
         except Exception as error:
             result = {"status": "failed", "reason": str(error)}
     print(json.dumps(result, ensure_ascii=False, indent=2))
-    return 0 if result.get("status") in ("ready", "generated") or result.get("model_available") else 1
+    successful_statuses = ("ready", "generated", "TECHNICAL_CHECKS_COMPLETE_HUMAN_REVIEW_REQUIRED")
+    return 0 if result.get("status") in successful_statuses or result.get("model_available") else 1
 
 
 if __name__ == "__main__":

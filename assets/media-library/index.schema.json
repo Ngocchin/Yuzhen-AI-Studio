@@ -1,0 +1,172 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Yuzhen cleared media library index",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "assets"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 2
+    },
+    "assets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "asset_id",
+          "path",
+          "game",
+          "source_url",
+          "owner",
+          "rights_category",
+          "license",
+          "checked_at",
+          "scope",
+          "permitted_platforms",
+          "commercial_use",
+          "editing_allowed",
+          "underlying_rights_cleared",
+          "status",
+          "sha256"
+        ],
+        "properties": {
+          "asset_id": {
+            "type": "string"
+          },
+          "game": {
+            "type": "string"
+          },
+          "characters": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "scene_tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "source_url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "owner": {
+            "type": "string"
+          },
+          "rights_category": {
+            "enum": [
+              "LICENSED_OR_PERMITTED",
+              "COPYRIGHT_EXCEPTION_CANDIDATE"
+            ]
+          },
+          "license": {
+            "type": "string"
+          },
+          "license_url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "checked_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "expires_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "scope": {
+            "type": "string"
+          },
+          "permitted_platforms": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "commercial_use": {
+            "type": "boolean"
+          },
+          "editing_allowed": {
+            "type": "boolean"
+          },
+          "underlying_rights_cleared": {
+            "type": "boolean"
+          },
+          "attribution": {
+            "type": "string"
+          },
+          "legal_assessment": {
+            "type": [
+              "object",
+              "null"
+            ]
+          },
+          "status": {
+            "const": "CLEARED_FOR_RECORDED_SCOPE"
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        }
+      }
+    },
+    "candidate_reviews": {
+      "type": "array",
+      "description": "Uncleared source review records only; never consumed as cleared media assets.",
+      "items": {
+        "type": "object",
+        "required": [
+          "asset_id",
+          "source_url",
+          "rights_status",
+          "final_status"
+        ],
+        "properties": {
+          "asset_id": {
+            "type": "string"
+          },
+          "source_url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "rights_status": {
+            "enum": [
+              "AUTHORIZED",
+              "EXCEPTION_REVIEW",
+              "PLATFORM_ONLY",
+              "UNKNOWN",
+              "UNUSABLE"
+            ]
+          },
+          "final_status": {
+            "enum": [
+              "READY_FOR_EDIT",
+              "WAITING_FOR_FILE",
+              "WAITING_FOR_RIGHTS_REVIEW",
+              "UNUSABLE"
+            ]
+          },
+          "selected_timecode": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "game_identity_verified": {
+            "type": "boolean"
+          }
+        }
+      }
+    }
+  }
+}

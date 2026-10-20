@@ -16,10 +16,16 @@ from pipeline import voice_router
 
 
 class StudioPipelineTests(unittest.TestCase):
-    def test_vieneu_is_opt_in_and_no_preset_is_preselected(self):
+    def test_approved_min_quan_is_mandatory_and_piper_cannot_fallback_automatically(self):
         config = json.loads((studio.ROOT / "config/voice.json").read_text())
-        self.assertEqual(config["active_engine"], "piper")
-        self.assertIsNone(config["selected_vieneu_voice"])
+        profile = json.loads((studio.ROOT / "config/voice_profiles/minh-quan.json").read_text())
+        self.assertEqual(config["active_engine"], "vieneu")
+        self.assertEqual(config["selected_vieneu_voice"], "Minh Quân")
+        self.assertEqual(config["fallback_engine"], "piper")
+        self.assertFalse(config["allow_automatic_production_fallback"])
+        self.assertTrue(profile["enabled_as_default"])
+        self.assertEqual(profile["approval_status"], "APPROVED_BY_USER")
+        self.assertEqual(config["production_modes"], ["game-commentary", "storytelling", "comedy-meme"])
         self.assertEqual([item["requested_name"] for item in config["vieneu"]["presets_to_compare"]], ["Minh Quân", "Anh Khôi", "Đức Trí"])
 
     def test_vieneu_alias_resolution_requires_an_installed_voice_and_excludes_adam(self):
@@ -46,10 +52,22 @@ class StudioPipelineTests(unittest.TestCase):
             self.assertEqual(result["status"], "refused")
             self.assertEqual(path.read_bytes(), b"existing approval")
 
-    def test_voice_router_keeps_piper_as_active_engine(self):
+    def test_voice_router_selects_approved_min_quan(self):
         config = voice_router.load_config()
-        self.assertEqual(config["active_engine"], "piper")
-        self.assertIsNone(config["selected_vieneu_voice"])
+        self.assertEqual(config["active_engine"], "vieneu")
+        self.assertEqual(config["selected_vieneu_voice"], "Minh Quân")
+
+    def test_production_voice_router_blocks_instead_of_substituting_min_quan(self):
+        with patch.object(voice_router.vieneu_voice, "VENV_PYTHON", Path("/definitely/missing/vieneu-python")), patch.object(voice_router, "synthesize_piper", return_value={"status": "generated"}) as fallback:
+            result = voice_router.synthesize("test", "voice.wav")
+        self.assertEqual(result["status"], "blocked")
+        fallback.assert_not_called()
+
+    def test_piper_fallback_requires_explicit_opt_in(self):
+        with patch.object(voice_router.vieneu_voice, "VENV_PYTHON", Path("/definitely/missing/vieneu-python")), patch.object(voice_router, "synthesize_piper", return_value={"status": "generated"}) as fallback:
+            result = voice_router.synthesize("test", "voice.wav", allow_fallback=True)
+        self.assertEqual(result["fallback_from"], "vieneu")
+        fallback.assert_called_once_with("test", "voice.wav")
 
     def test_vietnamese_game_slug(self):
         self.assertEqual(studio.slugify("Liên Quân Mobile"), "lien-quan-mobile")
@@ -72,6 +90,42 @@ class StudioPipelineTests(unittest.TestCase):
             self.assertEqual(len(json.loads((output / "ideas.json").read_text())), 3)
             self.assertEqual(checkpoint["director"]["execution"], "sequential_checkpointed")
 
+    def test_new_production_keeps_an_existing_checkpoint_and_script(self):
+        with tempfile.TemporaryDirectory() as temp, patch.object(studio, "ROOT", Path(temp)):
+            root = Path(temp)
+            existing = root / "outputs/lien-quan-mobile"
+            existing.mkdir(parents=True)
+            preserved_checkpoint = {"mode": "ENTERTAINMENT", "production_id": "Production #001"}
+            (existing / "checkpoint.json").write_text(json.dumps(preserved_checkpoint))
+            (existing / "script.json").write_text('{"title":"keep me"}')
+            (root / "config").mkdir()
+            (root / "config/defaults.json").write_text(json.dumps({"target_width": 1080, "target_height": 1920, "fps": 30, "meme_pause_seconds": 0.65}))
+            with patch.object(studio, "inspect_voice", return_value={"ready": False, "reason": "test fixture"}):
+                studio.run(Namespace(game="Liên Quân Mobile", mode="ENTERTAINMENT", voice=None))
+            self.assertEqual(json.loads((existing / "checkpoint.json").read_text()), preserved_checkpoint)
+            self.assertEqual(json.loads((existing / "script.json").read_text())["title"], "keep me")
+            self.assertTrue((root / "outputs/lien-quan-mobile-production-002/checkpoint.json").exists())
+
+    def test_unlicensed_gameplay_does_not_trigger_graphic_fallback(self):
+        with tempfile.TemporaryDirectory() as temp, patch.object(studio, "ROOT", Path(temp)):
+            root = Path(temp)
+            (root / "config").mkdir()
+            (root / "config/defaults.json").write_text(json.dumps({"target_width": 1080, "target_height": 1920, "fps": 30, "meme_pause_seconds": 0.65}))
+            (root / "assets/user").mkdir(parents=True)
+            (root / "assets/user/gameplay.mp4").write_bytes(b"unlicensed placeholder")
+            voice_path = root / "approved.wav"
+            with wave.open(str(voice_path), "wb") as wav:
+                wav.setnchannels(1)
+                wav.setsampwidth(2)
+                wav.setframerate(22050)
+                wav.writeframes(b"\0\0" * 22050)
+            with patch.object(studio, "render_original_graphics") as graphic, patch.object(studio, "render_video") as gameplay_render:
+                studio.run(Namespace(game="Liên Quân Mobile", mode="ENTERTAINMENT", voice=str(voice_path)))
+            graphic.assert_not_called()
+            gameplay_render.assert_not_called()
+            checkpoint = json.loads((root / "outputs/lien-quan-mobile/checkpoint.json").read_text())
+            self.assertEqual(checkpoint["phases"]["render"]["code"], "NEEDS_ASSETS")
+
     def test_generated_voice_is_accepted_for_render(self):
         with tempfile.TemporaryDirectory() as temp, patch.object(studio, "ROOT", Path(temp)):
             root = Path(temp)
@@ -79,6 +133,16 @@ class StudioPipelineTests(unittest.TestCase):
             (root / "config/defaults.json").write_text(json.dumps({"target_width": 1080, "target_height": 1920, "fps": 30, "meme_pause_seconds": 0.65}))
             (root / "assets/user").mkdir(parents=True)
             (root / "assets/user/gameplay.mp4").write_bytes(b"test fixture")
+            (root / "assets/user/media-rights.json").write_text(json.dumps({"assets": {"gameplay.mp4": {
+                "title": "Original user-recorded gameplay",
+                "source_url": "https://owner.example/clip",
+                "owner": "User recording owner",
+                "rights_evidence": {
+                    "basis": "user_ownership", "permitted_platforms": ["youtube", "tiktok"],
+                    "commercial_use": True, "editing_allowed": True,
+                    "underlying_rights_cleared": True, "scope": "Edited clips for this channel",
+                },
+            }}}))
             def synthesize_fixture(_text, output):
                 with wave.open(str(output), "wb") as wav:
                     wav.setnchannels(1)
@@ -173,7 +237,7 @@ class StudioPipelineTests(unittest.TestCase):
             subprocess.run([ffmpeg, "-y", "-f", "lavfi", "-i", "sine=frequency=880:duration=0.25", str(sfx)], check=True, capture_output=True)
             script = {"duration_seconds": 1.3, "meme_beat_seconds": 0.5, "voiceover": [{"start": 0, "end": 0.5, "text": "Xin chào"}, {"start": 0.5, "end": 1.3, "text": "Đang giao tranh"}]}
             settings = {"target_width": 1080, "target_height": 1920, "fps": 12, "meme_pause_seconds": 0.2}
-            rendered = studio.render_video(gameplay, voice, root / "outputs/sample", script, settings)
+            rendered = studio.render_video(gameplay, voice, root / "outputs/sample", script, settings, authorized_optional_audio={"meme-sfx.wav"})
             self.assertEqual(rendered["status"], "rendered", rendered)
             qc = studio.quality_control(root / "outputs/sample/video.mp4", 1.5)
             self.assertEqual(qc["status"], "passed", qc)

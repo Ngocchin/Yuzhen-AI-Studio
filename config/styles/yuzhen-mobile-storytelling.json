@@ -1,0 +1,78 @@
+{
+  "id": "yuzhen-mobile-storytelling",
+  "version": 2,
+  "purpose": "Persistent editorial style for original mobile-game storytelling on TikTok and YouTube Shorts.",
+  "reference_analysis": {
+    "status": "ANALYZED_FROM_USER_SUPPLIED_MP4",
+    "reference_url": "https://youtube.com/shorts/vIy761qHkWQ",
+    "local_reference_filename": "Tuyệt đối điện ảnh #battlefield3 #shorts #battlefield2042.mp4",
+    "inspection_method": "Direct inspection of user-supplied MP4 metadata and sampled frames/contact sheets. The linked YouTube page itself remains fetch-throttled.",
+    "technical_metadata": {"duration_seconds": 106.752, "width": 720, "height": 1280, "fps": 30, "video_codec": "h264", "audio_codec": "aac", "audio_sample_rate": 44100, "audio_channels": 2},
+    "observed_facts": [
+      "Portrait gaming story edit mixes Battlefield gameplay/cinematic shots with a visible creator facecam and brief reaction-meme cutaways.",
+      "It moves between first-person jet/air combat, parachute/ejection action, game UI/results and a brief real-world crowd/screen view, then returns to the creator reaction.",
+      "The reference uses close punch-ins and enlarged reaction crops; some portrait fills appear softened/blurred behind the focal image.",
+      "Vietnamese subtitles sit around the lower third with bold white text, dark outline/shadow and selective yellow word emphasis.",
+      "The edit mixes authentic game capture/cinematic material with creator reactions rather than relying on static cards or abstract vector scenes.",
+      "Visual cuts are frequent and tied to changes in action, reaction, or evidence; approximate sampled chapter ranges are recorded below."
+    ],
+    "timestamped_timeline": [
+      {"start": "00:00", "end": "00:18", "observation": "Immediate creator/facecam reaction, followed by falling/parachute and explosion gameplay, then repeated close reaction and meme cutaways to establish the emotional premise."},
+      {"start": "00:18", "end": "00:20", "observation": "Brief teal DICE title card acts as a chapter/identity beat."},
+      {"start": "00:20", "end": "00:54", "observation": "First-person jet sequence: cockpit, aircraft pursuit, aiming reticle and kill/result UI. Shots stay tied to the narrated gameplay event."},
+      {"start": "00:54", "end": "01:12", "observation": "Escalated first-person combat/explosion footage, result/UI inserts and a brief real-world screen/crowd shot provide payoff and scale."},
+      {"start": "01:12", "end": "01:30", "observation": "The visual palette shifts to newer Battlefield soldier/cinematic footage, juxtaposing eras before returning to aircraft action."},
+      {"start": "01:30", "end": "01:46", "observation": "The edit returns to the parachute/aircraft sequence and creator facecam; the creator's strong reaction/face-covering shot acts as the closing comic beat."}
+    ],
+    "audio_review": "Audio stream metadata was inspected, but speech/music were not reliably transcribed or listened to in this analysis. Do not infer exact speech cadence, voice identity, or music/SFX mix from the sampled frames.",
+    "reuse_boundary": "The file is a visual style reference only. This analysis does not grant permission to reuse its footage, facecam, audio, captions, exact edit, or creator identity.",
+    "note": "Reference-specific claims above come from the supplied MP4's sampled frames. Timestamp ranges are approximate visual chapters, not a frame-by-frame edit decision list. The design translation below is Yuzhen-authored adaptation, not a copy of the reference."
+  },
+  "observed_style_dna": {
+    "story_delivery": "A first-person gaming story supported by footage of the event and the creator's reactions.",
+    "visual_layers": ["gameplay_or_cinematic_as_primary_evidence", "brief_creator_facecam", "selective_reaction_meme", "game_UI_only_when_relevant"],
+    "editing": ["frequent action-motivated cuts", "brief punch-in reaction crops", "occasional softened portrait background fill", "switch visual scale for reveal/payoff"],
+    "subtitles": {"placement": "lower third", "appearance": "bold white with dark outline/shadow", "emphasis": "selective yellow word highlight"},
+    "caveats": ["Exact vocal delivery and audio balance are not yet verified by listening.", "The specific Battlefield footage, DICE card, facecam, memes, captions, and audio are not reusable permissions."]
+  },
+  "content": {
+    "default_for": "mobile_game_storytelling",
+    "story_structure": ["HOOK", "SETUP", "CONFLICT", "CLIMAX", "PAYOFF", "ENDING"],
+    "story_categories": ["CHARACTER_STORIES", "GAME_HISTORY", "COMMUNITY_STORIES", "ESPORTS_STORIES"],
+    "editorial_requirements": [
+      "Original Vietnamese script with a clear point of view, not a news readout or clip compilation.",
+      "Every factual, canon, or match claim is linked to a verified source.",
+      "Each source clip has a scene-specific editorial purpose mapped to narration.",
+      "Prefer game footage; verify game identity, source, timecode, and reuse basis before editing.",
+      "Never present illustrations or motion graphics as authentic gameplay."
+    ],
+    "duration_seconds": {"min": 40, "max": 60, "extended_min": 65, "extended_max": 90}
+  },
+  "proposed_editing_defaults": {
+    "status": "YUZHEN_ADAPTATION_OF_OBSERVED_METHODS",
+    "format": {"width": 1080, "height": 1920, "fps": 30, "aspect_ratio": "9:16"},
+    "opening_hook_seconds": {"min": 0, "max": 3},
+    "cut_rhythm": "Adapt the reference's frequent, action-motivated cuts; keep every inserted shot relevant to the narrated claim and allow enough screen time to read the evidence.",
+    "image_treatment": ["use rights-cleared mobile-game footage as story evidence", "vertical crop preserving the gameplay focal action", "brief facecam or reaction inserts only when available and authorized", "selective punch-in on relevant action", "portrait blur fill only when needed to preserve the original frame", "synchronized lower-third subtitles with white text, dark outline, and selective yellow emphasis", "callouts only when they explain context"],
+    "sound": "Keep Minh Quân as the sole narration voice. Voice leads; use only cleared music and selective SFX. Do not copy the reference soundtrack or voice.",
+    "ending": "Resolve the story question, then invite a specific audience response without manufacturing a cliffhanger."
+  },
+  "voice": {
+    "engine": "VieNeu-TTS",
+    "version": "3.7.1",
+    "preset": "Minh Quân",
+    "required": true,
+    "allow_automatic_fallback": false
+  },
+  "media": {
+    "priority": ["licensed_or_permitted_gameplay", "licensed_or_permitted_cinematics", "licensed_or_permitted_character_art", "reviewed_exception_candidate"],
+    "rights_policy": "config/media-rights-policy.json",
+    "unverified_media_action": "report_exact_scene_gaps_and_prepare_an_edit_decision_list; do_not_render_or_substitute_vector_art",
+    "platform_remix_scope": "Use only within the platform feature and terms; never download for cross-platform reuse.",
+    "do_not_overwrite_existing_productions": true
+  },
+  "qc": {
+    "automated": ["container_and_stream_probe", "resolution_and_duration", "subtitle_file_timing", "audio_peak_and_clipping_check"],
+    "human_review": ["voice_naturalness", "story_clarity", "shot_relevance", "subtitle_safe_area", "rights_scope"]
+  }
+}

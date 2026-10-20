@@ -61,7 +61,7 @@ for filename in ("moss_audio_tokenizer_decode_full.onnx", "moss_audio_tokenizer_
         path.unlink()
         shutil.copy2(source, path)
 
-print("VieNeu-TTS 3.8.3 CPU assets installed and pinned under assets/models/ (Git-ignored).")
+print("VieNeu-TTS 3.7.1 CPU assets installed and pinned under assets/models/ (Git-ignored).")
 PY
 
 printf 'Setup complete. Check voices with: %s -m pipeline.vieneu_voice voices\n' "$VENV/bin/python"
